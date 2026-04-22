@@ -1,5 +1,11 @@
 <template>
   <div class="space-y-6">
+
+    <!-- API error banner -->
+    <div v-if="apiError" class="p-4 bg-red-50 border border-red-200 rounded-lg text-sm text-red-700 font-mono">
+      {{ apiError }}
+    </div>
+
     <!-- KPI cards -->
     <div class="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-4 gap-4">
       <div v-for="kpi in kpis" :key="kpi.label" class="card p-5">
@@ -68,6 +74,7 @@ ChartJS.register(CategoryScale, LinearScale, BarElement, LineElement, PointEleme
 
 const stats = ref(null)
 const loading = ref(false)
+const apiError = ref('')
 let interval = null
 
 const lastUpdated = computed(() => {
@@ -160,10 +167,14 @@ const lineOpts = {
 
 async function fetchStats() {
   loading.value = true
+  apiError.value = ''
   try {
     const res = await dashboardApi.getStats()
     stats.value = res.data
   } catch (e) {
+    const status = e.response?.status
+    const msg = e.response?.data?.detail || e.message || 'Unknown error'
+    apiError.value = status ? `API error ${status}: ${msg}` : `Network error: ${msg} — check VITE_API_URL and Railway CORS`
     console.error('Dashboard stats failed', e)
   } finally {
     loading.value = false

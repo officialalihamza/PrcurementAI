@@ -40,3 +40,17 @@ def root():
 @app.get("/health")
 def health():
     return {"status": "healthy"}
+
+
+@app.get("/debug")
+def debug():
+    import lib.ocds_fetcher as fetcher
+    cache = fetcher.load_cache()
+    return {
+        "status": "ok",
+        "allowed_origins": os.getenv("ALLOWED_ORIGINS", "*"),
+        "supabase_url_set": bool(os.getenv("SUPABASE_URL")),
+        "supabase_key_set": bool(os.getenv("SUPABASE_KEY")),
+        "analytics_cache_records": cache.get("record_count", 0),
+        "analytics_cache_source": cache.get("source", "none"),
+    }
