@@ -1,3 +1,4 @@
+from contextlib import asynccontextmanager
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 from dotenv import load_dotenv
@@ -6,11 +7,27 @@ import os
 load_dotenv()
 
 from routers import auth, contracts, dashboard, alerts, company, eda, analytics
+from lib.alert_scheduler import check_and_send_alerts
+from apscheduler.schedulers.asyncio import AsyncIOScheduler
+
+_scheduler = AsyncIOScheduler()
+
+
+@asynccontextmanager
+async def lifespan(app: FastAPI):
+    _scheduler.add_job(check_and_send_alerts, "interval", hours=1, id="alert_checker",
+                       misfire_grace_time=300)
+    _scheduler.start()
+    print("[startup] Alert scheduler started — checks every hour")
+    yield
+    _scheduler.shutdown(wait=False)
+
 
 app = FastAPI(
     title="UK Procurement API",
     description="SaaS platform for UK government contract discovery",
     version="1.0.0",
+    lifespan=lifespan,
 )
 
 _raw_origins = os.getenv("ALLOWED_ORIGINS", "").strip()
@@ -41,6 +58,13 @@ def root():
 @app.get("/health")
 def health():
     return {"status": "healthy"}
+
+
+@app.post("/alerts/trigger")
+async def trigger_alerts_now():
+    """Manually run all alert checks immediately (for testing)."""
+    await check_and_send_alerts()
+    return {"message": "Alert check complete — see Railway logs"}
 
 
 @app.get("/debug")
