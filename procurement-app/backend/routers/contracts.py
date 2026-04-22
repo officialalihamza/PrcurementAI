@@ -76,7 +76,6 @@ def save_contract(
     current_user: dict = Depends(get_current_user),
 ):
     ocid = body.get("ocid")
-    notes = body.get("notes", "")
     if not ocid:
         raise HTTPException(status_code=400, detail="ocid required")
 
@@ -86,9 +85,14 @@ def save_contract(
             return {"message": "Already saved", "id": existing.data[0]["id"]}
 
         res = supabase.table("saved_contracts").insert({
-            "user_id": current_user["user_id"],
-            "ocid": ocid,
-            "notes": notes,
+            "user_id":  current_user["user_id"],
+            "ocid":     ocid,
+            "title":    body.get("title", ""),
+            "buyer":    body.get("buyer", ""),
+            "region":   body.get("region", ""),
+            "value":    body.get("value"),
+            "deadline": body.get("deadline", ""),
+            "notes":    body.get("notes", ""),
         }).execute()
         return {"message": "Saved", "id": res.data[0]["id"]}
     except Exception as e:

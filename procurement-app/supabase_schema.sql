@@ -62,3 +62,26 @@ create policy "Users can read history of their own alerts"
         and alerts.user_id = auth.uid()
     )
   );
+
+-- ─── saved_contracts ──────────────────────────────────────────────────────────
+create table if not exists public.saved_contracts (
+  id          uuid primary key default gen_random_uuid(),
+  user_id     uuid not null references auth.users(id) on delete cascade,
+  ocid        text not null,
+  title       text default '',
+  buyer       text default '',
+  region      text default '',
+  value       numeric,
+  deadline    text default '',
+  notes       text default '',
+  saved_at    timestamptz default now(),
+  unique(user_id, ocid)
+);
+
+alter table public.saved_contracts enable row level security;
+
+create policy "Users can manage their own saved contracts"
+  on public.saved_contracts
+  for all
+  using (auth.uid() = user_id)
+  with check (auth.uid() = user_id);

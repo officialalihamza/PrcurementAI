@@ -243,7 +243,7 @@ async function toggleSave(contract) {
     const saved = contractsStore.savedContracts.find(c => c.ocid === contract.ocid)
     if (saved) await contractsStore.removeSaved(saved.id)
   } else {
-    await contractsStore.saveContract(contract.ocid)
+    await contractsStore.saveContract(contract)
   }
 }
 

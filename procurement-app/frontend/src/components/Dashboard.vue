@@ -8,9 +8,14 @@
 
     <!-- KPI cards -->
     <div class="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-4 gap-4">
-      <div v-for="kpi in kpis" :key="kpi.label" class="card p-5">
+      <div
+        v-for="kpi in kpis" :key="kpi.label"
+        class="card p-5"
+        :class="kpi.onClick ? 'cursor-pointer hover:shadow-md hover:border-brand-200 transition-shadow' : ''"
+        @click="kpi.onClick && kpi.onClick()"
+      >
         <p class="text-sm font-medium text-gray-500">{{ kpi.label }}</p>
-        <p class="mt-1 text-2xl font-bold text-gray-900">{{ kpi.value }}</p>
+        <p class="mt-1 text-2xl font-bold" :class="kpi.onClick ? 'text-brand-600 underline decoration-dotted' : 'text-gray-900'">{{ kpi.value }}</p>
         <p class="mt-1 text-xs text-gray-400">{{ kpi.sub }}</p>
       </div>
     </div>
@@ -63,6 +68,7 @@
 
 <script setup>
 import { ref, computed, onMounted, onUnmounted } from 'vue'
+import { useRouter } from 'vue-router'
 import { Bar, Line } from 'vue-chartjs'
 import {
   Chart as ChartJS, CategoryScale, LinearScale, BarElement,
@@ -72,10 +78,17 @@ import { dashboardApi } from '@/lib/api'
 
 ChartJS.register(CategoryScale, LinearScale, BarElement, LineElement, PointElement, Title, Tooltip, Legend)
 
+const router = useRouter()
 const stats = ref(null)
 const loading = ref(false)
 const apiError = ref('')
 let interval = null
+
+function goToRecentContracts() {
+  const to   = new Date().toISOString().split('T')[0]
+  const from = new Date(Date.now() - 90 * 86400000).toISOString().split('T')[0]
+  router.push({ name: 'Contracts', query: { date_from: from, date_to: to } })
+}
 
 const lastUpdated = computed(() => {
   return new Date().toLocaleTimeString('en-GB', { hour: '2-digit', minute: '2-digit' })
@@ -84,7 +97,7 @@ const lastUpdated = computed(() => {
 const kpis = computed(() => {
   const k = stats.value?.kpis || {}
   return [
-    { label: 'Contracts This Week', value: k.week_count ?? '—', sub: 'New opportunities' },
+    { label: 'Last 3 Months', value: k.week_count ?? '—', sub: 'New opportunities', onClick: goToRecentContracts },
     { label: 'SME Win Rate', value: k.sme_rate != null ? k.sme_rate + '%' : '—', sub: 'Across all contracts' },
     { label: 'Avg Contract Value', value: k.avg_value != null ? '£' + k.avg_value.toLocaleString('en-GB', { maximumFractionDigits: 0 }) : '—', sub: 'Mean award value' },
     { label: 'Total Spend', value: k.total_spend != null ? '£' + (k.total_spend / 1e6).toFixed(1) + 'M' : '—', sub: 'Total contract value' },

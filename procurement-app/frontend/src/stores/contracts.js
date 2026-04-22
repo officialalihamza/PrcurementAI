@@ -41,8 +41,8 @@ export const useContractsStore = defineStore('contracts', () => {
     } catch {}
   }
 
-  async function saveContract(ocid, notes = '') {
-    await contractsApi.save(ocid, notes)
+  async function saveContract(contract, notes = '') {
+    await contractsApi.save(contract, notes)
     await fetchSaved()
   }
 

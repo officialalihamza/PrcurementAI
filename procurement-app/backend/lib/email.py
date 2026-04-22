@@ -53,13 +53,13 @@ def _build_html(alert_name: str, contracts: List[Dict[str, Any]]) -> str:
             <tbody>{rows}</tbody>
           </table>
           <div style="margin-top:24px;text-align:center">
-            <a href="https://yourapp.netlify.app/contracts" style="background:#2563eb;color:#fff;padding:12px 24px;border-radius:6px;text-decoration:none;font-weight:600">View All Contracts</a>
+            <a href="https://glittery-meerkat-c7d01f.netlify.app/contracts" style="background:#2563eb;color:#fff;padding:12px 24px;border-radius:6px;text-decoration:none;font-weight:600">View All Contracts</a>
           </div>
         </div>
         <div style="background:#f9fafb;padding:16px 32px;text-align:center">
           <p style="color:#9ca3af;font-size:12px;margin:0">
             You're receiving this because you set up an alert on ProcurementAI.
-            <a href="https://yourapp.netlify.app/settings" style="color:#6b7280">Manage alerts</a>
+            <a href="https://glittery-meerkat-c7d01f.netlify.app/settings" style="color:#6b7280">Manage alerts</a>
           </p>
         </div>
       </div>

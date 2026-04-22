@@ -301,11 +301,11 @@ def _compute_stats(contracts: List[dict]) -> Dict[str, Any]:
     from datetime import datetime, timedelta
 
     now = datetime.utcnow()
-    week_ago = now - timedelta(days=7)
+    three_months_ago = now - timedelta(days=90)
 
     week_contracts = [
         c for c in contracts
-        if c.get("published") and c["published"][:10] >= week_ago.strftime("%Y-%m-%d")
+        if c.get("published") and c["published"][:10] >= three_months_ago.strftime("%Y-%m-%d")
     ]
 
     values = [c["value"] for c in contracts if c.get("value")]

@@ -42,7 +42,15 @@ export const companyApi = {
 export const contractsApi = {
   search: (params) => api.get('/contracts/search', { params }),
   getSaved: () => api.get('/contracts/saved'),
-  save: (ocid, notes) => api.post('/contracts/saved', { ocid, notes }),
+  save: (contract, notes = '') => api.post('/contracts/saved', {
+    ocid:     contract.ocid,
+    title:    contract.title,
+    buyer:    contract.buyer,
+    region:   contract.region,
+    value:    contract.value,
+    deadline: contract.deadline,
+    notes,
+  }),
   deleteSaved: (id) => api.delete(`/contracts/saved/${id}`),
 }
 
