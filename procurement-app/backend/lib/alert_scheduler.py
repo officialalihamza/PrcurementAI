@@ -28,7 +28,9 @@ async def check_and_send_alerts():
         print(f"[alerts] Could not fetch alerts: {e}")
         return
 
+    print(f"[alerts] Found {len(res.data or [])} active alert(s)")
     for alert in (res.data or []):
+        print(f"[alerts] Processing: '{alert.get('name')}' (freq={alert.get('frequency')})")
         try:
             await _process_alert(alert)
         except Exception as e:
@@ -52,7 +54,9 @@ async def _process_alert(alert: dict):
 
     if hist.data:
         last_sent = datetime.fromisoformat(hist.data[0]["sent_at"].replace("Z", "+00:00"))
-        if (now - last_sent).total_seconds() < min_gap:
+        elapsed = (now - last_sent).total_seconds()
+        if elapsed < min_gap:
+            print(f"[alerts]   → skipped (sent {int(elapsed/60)}m ago, min gap {int(min_gap/60)}m)")
             return
 
     # ── Search Contracts Finder ──────────────────────────────────────────────
@@ -65,6 +69,7 @@ async def _process_alert(alert: dict):
         sme_flag="sme" if filters.get("sme_only") else None,
     )
     contracts = result.get("contracts") or []
+    print(f"[alerts]   → CF search returned {len(contracts)} contract(s)")
     if not contracts:
         return
 
@@ -80,6 +85,7 @@ async def _process_alert(alert: dict):
                 sent_ocids.add(c["ocid"])
 
     new_contracts = [c for c in contracts if c.get("ocid") not in sent_ocids]
+    print(f"[alerts]   → {len(new_contracts)} new (not previously sent)")
     if not new_contracts:
         return
 
@@ -87,11 +93,12 @@ async def _process_alert(alert: dict):
     try:
         user_res   = supabase.auth.admin.get_user_by_id(user_id)
         user_email = user_res.user.email if (user_res and user_res.user) else None
-    except Exception:
+    except Exception as e:
+        print(f"[alerts]   → email lookup failed: {e} — is SUPABASE_KEY the service_role key?")
         user_email = None
 
     if not user_email:
-        print(f"[alerts] Could not resolve email for user {user_id}, skipping")
+        print(f"[alerts]   → no email for user {user_id}, skipping")
         return
 
     # ── Send email ───────────────────────────────────────────────────────────
