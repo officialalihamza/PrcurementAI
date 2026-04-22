@@ -1,0 +1,20 @@
+# Large data files — never commit
+Data/
+Misc/*.png
+*.csv
+*.jsonl
+*.jsonl.gz
+
+# Python
+__pycache__/
+*.py[cod]
+.env
+.venv/
+venv/
+
+# Node
+procurement-app/frontend/node_modules/
+procurement-app/frontend/dist/
+
+# Keep the pre-computed analytics cache
+!procurement-app/backend/analytics_cache.json
