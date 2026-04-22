@@ -62,9 +62,19 @@ def health():
 
 @app.post("/alerts/trigger")
 async def trigger_alerts_now():
-    """Manually run all alert checks immediately (for testing)."""
-    await check_and_send_alerts()
-    return {"message": "Alert check complete — see Railway logs"}
+    """Run all alert checks immediately and return the full trace in the response."""
+    import io, sys
+    buf = io.StringIO()
+    old = sys.stdout
+    sys.stdout = buf
+    try:
+        await check_and_send_alerts()
+    except Exception as e:
+        print(f"FATAL: {e}")
+    finally:
+        sys.stdout = old
+    lines = [l for l in buf.getvalue().splitlines() if l.strip()]
+    return {"log": lines}
 
 
 @app.get("/debug")
