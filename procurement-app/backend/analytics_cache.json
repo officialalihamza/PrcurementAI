@@ -1,0 +1,1307 @@
+{
+  "source": "csv_precomputed",
+  "computed_at": "2026-04-22T02:19:51.284691+00:00",
+  "record_count": 755949,
+  "totals": {
+    "sme": 350061,
+    "large": 347265,
+    "unknown": 58623
+  },
+  "sme_by_year": [
+    {
+      "year": 2016,
+      "sme": 17025,
+      "large": 39615,
+      "total": 56697,
+      "sme_rate": 30.1
+    },
+    {
+      "year": 2017,
+      "sme": 15961,
+      "large": 23931,
+      "total": 40544,
+      "sme_rate": 40.0
+    },
+    {
+      "year": 2018,
+      "sme": 22883,
+      "large": 23916,
+      "total": 47109,
+      "sme_rate": 48.9
+    },
+    {
+      "year": 2019,
+      "sme": 25516,
+      "large": 24824,
+      "total": 50342,
+      "sme_rate": 50.7
+    },
+    {
+      "year": 2020,
+      "sme": 24498,
+      "large": 21410,
+      "total": 45917,
+      "sme_rate": 53.4
+    },
+    {
+      "year": 2021,
+      "sme": 39837,
+      "large": 38120,
+      "total": 85792,
+      "sme_rate": 51.1
+    },
+    {
+      "year": 2022,
+      "sme": 46317,
+      "large": 38189,
+      "total": 93040,
+      "sme_rate": 54.8
+    },
+    {
+      "year": 2023,
+      "sme": 52099,
+      "large": 40489,
+      "total": 100742,
+      "sme_rate": 56.3
+    },
+    {
+      "year": 2024,
+      "sme": 50634,
+      "large": 40738,
+      "total": 100077,
+      "sme_rate": 55.4
+    },
+    {
+      "year": 2025,
+      "sme": 42651,
+      "large": 43610,
+      "total": 103610,
+      "sme_rate": 49.4
+    },
+    {
+      "year": 2026,
+      "sme": 12640,
+      "large": 12423,
+      "total": 32079,
+      "sme_rate": 50.4
+    }
+  ],
+  "sme_by_band": [
+    {
+      "band": "Under 10k",
+      "sme_rate": 56.2,
+      "n": 24658
+    },
+    {
+      "band": "10k-100k",
+      "sme_rate": 47.1,
+      "n": 227985
+    },
+    {
+      "band": "100k-1M",
+      "sme_rate": 48.3,
+      "n": 188814
+    },
+    {
+      "band": "1M-5M",
+      "sme_rate": 44.5,
+      "n": 54640
+    },
+    {
+      "band": "5M-25M",
+      "sme_rate": 44.0,
+      "n": 26731
+    },
+    {
+      "band": "Over 25M",
+      "sme_rate": 42.6,
+      "n": 16321
+    }
+  ],
+  "sme_by_region": [
+    {
+      "region": "UKD35",
+      "sme_rate": 86.7,
+      "n": 443
+    },
+    {
+      "region": "UKL24",
+      "sme_rate": 85.4,
+      "n": 158
+    },
+    {
+      "region": "UKM84",
+      "sme_rate": 80.5,
+      "n": 128
+    },
+    {
+      "region": "UKG11",
+      "sme_rate": 76.7,
+      "n": 103
+    },
+    {
+      "region": "UKG37",
+      "sme_rate": 75.9,
+      "n": 174
+    },
+    {
+      "region": "UKN0A",
+      "sme_rate": 75.6,
+      "n": 78
+    },
+    {
+      "region": "UKM65",
+      "sme_rate": 75.5,
+      "n": 53
+    },
+    {
+      "region": "UKI51",
+      "sme_rate": 75.4,
+      "n": 171
+    },
+    {
+      "region": "UKD44",
+      "sme_rate": 75.0,
+      "n": 76
+    },
+    {
+      "region": "UKM92",
+      "sme_rate": 75.0,
+      "n": 120
+    },
+    {
+      "region": "UKL14",
+      "sme_rate": 73.8,
+      "n": 244
+    },
+    {
+      "region": "UKF3",
+      "sme_rate": 72.2,
+      "n": 299
+    },
+    {
+      "region": "UKL13",
+      "sme_rate": 72.1,
+      "n": 111
+    },
+    {
+      "region": "UKD37",
+      "sme_rate": 72.0,
+      "n": 118
+    },
+    {
+      "region": "UKJ44",
+      "sme_rate": 71.4,
+      "n": 259
+    },
+    {
+      "region": "UKF30",
+      "sme_rate": 71.0,
+      "n": 566
+    },
+    {
+      "region": "UKD46",
+      "sme_rate": 69.8,
+      "n": 63
+    },
+    {
+      "region": "UKL12",
+      "sme_rate": 69.8,
+      "n": 179
+    },
+    {
+      "region": "UKM77",
+      "sme_rate": 69.6,
+      "n": 184
+    },
+    {
+      "region": "UKH31",
+      "sme_rate": 69.4,
+      "n": 170
+    },
+    {
+      "region": "UKM83",
+      "sme_rate": 69.2,
+      "n": 351
+    },
+    {
+      "region": "UKE22",
+      "sme_rate": 68.3,
+      "n": 457
+    },
+    {
+      "region": "UKF15",
+      "sme_rate": 68.0,
+      "n": 250
+    },
+    {
+      "region": "UKM76",
+      "sme_rate": 68.0,
+      "n": 100
+    },
+    {
+      "region": "UKF12",
+      "sme_rate": 67.9,
+      "n": 112
+    },
+    {
+      "region": "UKN0D",
+      "sme_rate": 67.9,
+      "n": 81
+    },
+    {
+      "region": "UKJ43",
+      "sme_rate": 67.8,
+      "n": 90
+    },
+    {
+      "region": "UKE11",
+      "sme_rate": 67.2,
+      "n": 366
+    },
+    {
+      "region": "UKM62",
+      "sme_rate": 67.0,
+      "n": 91
+    },
+    {
+      "region": "UKI74",
+      "sme_rate": 66.9,
+      "n": 272
+    },
+    {
+      "region": "UKM78",
+      "sme_rate": 66.2,
+      "n": 80
+    },
+    {
+      "region": "UKE3",
+      "sme_rate": 65.8,
+      "n": 161
+    },
+    {
+      "region": "UKG13",
+      "sme_rate": 65.5,
+      "n": 23826
+    },
+    {
+      "region": "UKG21",
+      "sme_rate": 65.2,
+      "n": 187
+    },
+    {
+      "region": "UKE32",
+      "sme_rate": 65.1,
+      "n": 1138
+    },
+    {
+      "region": "UKK30",
+      "sme_rate": 64.6,
+      "n": 396
+    },
+    {
+      "region": "UKK41",
+      "sme_rate": 64.6,
+      "n": 319
+    },
+    {
+      "region": "UKE2",
+      "sme_rate": 64.4,
+      "n": 87
+    },
+    {
+      "region": "UKD41",
+      "sme_rate": 64.2,
+      "n": 95
+    },
+    {
+      "region": "UKH21",
+      "sme_rate": 64.0,
+      "n": 172
+    },
+    {
+      "region": "UKH32",
+      "sme_rate": 63.9,
+      "n": 61
+    },
+    {
+      "region": "UKM71",
+      "sme_rate": 63.9,
+      "n": 144
+    },
+    {
+      "region": "UKM6",
+      "sme_rate": 63.7,
+      "n": 234
+    },
+    {
+      "region": "UKM93",
+      "sme_rate": 63.7,
+      "n": 240
+    },
+    {
+      "region": "UKJ36",
+      "sme_rate": 63.6,
+      "n": 297
+    },
+    {
+      "region": "UKL16",
+      "sme_rate": 63.5,
+      "n": 148
+    },
+    {
+      "region": "UKD71",
+      "sme_rate": 63.4,
+      "n": 344
+    },
+    {
+      "region": "UKE44",
+      "sme_rate": 63.4,
+      "n": 317
+    },
+    {
+      "region": "UKH1",
+      "sme_rate": 63.4,
+      "n": 142
+    },
+    {
+      "region": "UKK43",
+      "sme_rate": 63.1,
+      "n": 747
+    },
+    {
+      "region": "UKD42",
+      "sme_rate": 62.8,
+      "n": 145
+    },
+    {
+      "region": "UKH24",
+      "sme_rate": 62.8,
+      "n": 226
+    },
+    {
+      "region": "UKI6",
+      "sme_rate": 62.7,
+      "n": 51
+    },
+    {
+      "region": "UKD63",
+      "sme_rate": 62.4,
+      "n": 351
+    },
+    {
+      "region": "UKJ45",
+      "sme_rate": 62.4,
+      "n": 362
+    },
+    {
+      "region": "UKK12",
+      "sme_rate": 62.4,
+      "n": 1069
+    },
+    {
+      "region": "UKI52",
+      "sme_rate": 62.3,
+      "n": 239
+    },
+    {
+      "region": "UKM91",
+      "sme_rate": 62.3,
+      "n": 53
+    },
+    {
+      "region": "UKM72",
+      "sme_rate": 62.2,
+      "n": 288
+    },
+    {
+      "region": "UKE4",
+      "sme_rate": 61.9,
+      "n": 331
+    },
+    {
+      "region": "UKD4",
+      "sme_rate": 61.6,
+      "n": 336
+    },
+    {
+      "region": "UKC1",
+      "sme_rate": 61.2,
+      "n": 85
+    },
+    {
+      "region": "UKJ37",
+      "sme_rate": 61.2,
+      "n": 85
+    },
+    {
+      "region": "UKL17",
+      "sme_rate": 61.0,
+      "n": 231
+    },
+    {
+      "region": "UKE13",
+      "sme_rate": 60.7,
+      "n": 252
+    },
+    {
+      "region": "UKM50",
+      "sme_rate": 60.7,
+      "n": 257
+    },
+    {
+      "region": "UKD62",
+      "sme_rate": 60.2,
+      "n": 264
+    },
+    {
+      "region": "UKJ32",
+      "sme_rate": 60.2,
+      "n": 412
+    },
+    {
+      "region": "UKM82",
+      "sme_rate": 60.0,
+      "n": 1264
+    },
+    {
+      "region": "UKM73",
+      "sme_rate": 59.8,
+      "n": 107
+    },
+    {
+      "region": "UKI53",
+      "sme_rate": 59.6,
+      "n": 94
+    },
+    {
+      "region": "UKN0",
+      "sme_rate": 59.3,
+      "n": 108
+    },
+    {
+      "region": "UKK2",
+      "sme_rate": 59.2,
+      "n": 142
+    },
+    {
+      "region": "UKI4",
+      "sme_rate": 58.5,
+      "n": 123
+    },
+    {
+      "region": "UKC21",
+      "sme_rate": 58.4,
+      "n": 113
+    },
+    {
+      "region": "UKE12",
+      "sme_rate": 58.3,
+      "n": 571
+    },
+    {
+      "region": "UKK42",
+      "sme_rate": 58.3,
+      "n": 120
+    },
+    {
+      "region": "UKL18",
+      "sme_rate": 58.2,
+      "n": 383
+    },
+    {
+      "region": "UKM75",
+      "sme_rate": 58.1,
+      "n": 916
+    },
+    {
+      "region": "UKJ46",
+      "sme_rate": 58.0,
+      "n": 69
+    },
+    {
+      "region": "UKF22",
+      "sme_rate": 57.9,
+      "n": 487
+    },
+    {
+      "region": "UKF11",
+      "sme_rate": 57.7,
+      "n": 461
+    },
+    {
+      "region": "UKD12",
+      "sme_rate": 57.3,
+      "n": 225
+    },
+    {
+      "region": "UKK15",
+      "sme_rate": 57.3,
+      "n": 274
+    },
+    {
+      "region": "UKN0E",
+      "sme_rate": 57.3,
+      "n": 82
+    },
+    {
+      "region": "UKG31",
+      "sme_rate": 57.2,
+      "n": 1844
+    },
+    {
+      "region": "UKH36",
+      "sme_rate": 57.2,
+      "n": 145
+    },
+    {
+      "region": "UKL1",
+      "sme_rate": 57.0,
+      "n": 93
+    },
+    {
+      "region": "UKG38",
+      "sme_rate": 56.2,
+      "n": 80
+    },
+    {
+      "region": "UKH16",
+      "sme_rate": 56.2,
+      "n": 153
+    },
+    {
+      "region": "UKM94",
+      "sme_rate": 56.0,
+      "n": 232
+    },
+    {
+      "region": "UKN",
+      "sme_rate": 55.9,
+      "n": 574
+    },
+    {
+      "region": "UKI63",
+      "sme_rate": 55.6,
+      "n": 234
+    },
+    {
+      "region": "UKL23",
+      "sme_rate": 55.6,
+      "n": 160
+    },
+    {
+      "region": "UKH11",
+      "sme_rate": 55.5,
+      "n": 146
+    },
+    {
+      "region": "UKF13",
+      "sme_rate": 55.3,
+      "n": 217
+    },
+    {
+      "region": "UKD36",
+      "sme_rate": 55.2,
+      "n": 143
+    },
+    {
+      "region": "UKF",
+      "sme_rate": 55.1,
+      "n": 316
+    },
+    {
+      "region": "UKI43",
+      "sme_rate": 54.4,
+      "n": 857
+    },
+    {
+      "region": "UKE45",
+      "sme_rate": 54.3,
+      "n": 337
+    },
+    {
+      "region": "UKI41",
+      "sme_rate": 54.3,
+      "n": 762
+    },
+    {
+      "region": "UKJ41",
+      "sme_rate": 54.3,
+      "n": 311
+    },
+    {
+      "region": "UKK13",
+      "sme_rate": 54.3,
+      "n": 392
+    },
+    {
+      "region": "UKK25",
+      "sme_rate": 54.3,
+      "n": 92
+    },
+    {
+      "region": "UKG24",
+      "sme_rate": 54.2,
+      "n": 443
+    },
+    {
+      "region": "UKG36",
+      "sme_rate": 54.0,
+      "n": 137
+    },
+    {
+      "region": "UKD73",
+      "sme_rate": 53.9,
+      "n": 180
+    },
+    {
+      "region": "UKJ13",
+      "sme_rate": 53.9,
+      "n": 245
+    },
+    {
+      "region": "UKD74",
+      "sme_rate": 53.8,
+      "n": 208
+    },
+    {
+      "region": "UKL22",
+      "sme_rate": 53.8,
+      "n": 824
+    },
+    {
+      "region": "UKF21",
+      "sme_rate": 53.7,
+      "n": 367
+    },
+    {
+      "region": "UKF24",
+      "sme_rate": 53.6,
+      "n": 274
+    },
+    {
+      "region": "UKK",
+      "sme_rate": 53.5,
+      "n": 381
+    },
+    {
+      "region": "UKJ35",
+      "sme_rate": 53.2,
+      "n": 111
+    },
+    {
+      "region": "UKG12",
+      "sme_rate": 53.1,
+      "n": 290
+    },
+    {
+      "region": "UKG3",
+      "sme_rate": 53.1,
+      "n": 175
+    },
+    {
+      "region": "UKJ11",
+      "sme_rate": 53.1,
+      "n": 409
+    },
+    {
+      "region": "UKF14",
+      "sme_rate": 53.0,
+      "n": 449
+    },
+    {
+      "region": "UKD45",
+      "sme_rate": 52.9,
+      "n": 221
+    },
+    {
+      "region": "UKI34",
+      "sme_rate": 52.8,
+      "n": 125
+    },
+    {
+      "region": "UKJ27",
+      "sme_rate": 52.7,
+      "n": 203
+    },
+    {
+      "region": "UKH34",
+      "sme_rate": 52.6,
+      "n": 156
+    },
+    {
+      "region": "UKJ31",
+      "sme_rate": 52.4,
+      "n": 452
+    },
+    {
+      "region": "UKF25",
+      "sme_rate": 52.2,
+      "n": 347
+    },
+    {
+      "region": "UKC23",
+      "sme_rate": 52.1,
+      "n": 459
+    },
+    {
+      "region": "UKG2",
+      "sme_rate": 51.9,
+      "n": 108
+    },
+    {
+      "region": "UKC14",
+      "sme_rate": 51.7,
+      "n": 435
+    },
+    {
+      "region": "UKE31",
+      "sme_rate": 51.6,
+      "n": 614
+    },
+    {
+      "region": "UKG23",
+      "sme_rate": 51.1,
+      "n": 184
+    },
+    {
+      "region": "UKL21",
+      "sme_rate": 51.0,
+      "n": 202
+    },
+    {
+      "region": "UKJ28",
+      "sme_rate": 50.9,
+      "n": 114
+    },
+    {
+      "region": "UKL",
+      "sme_rate": 50.9,
+      "n": 858
+    },
+    {
+      "region": "UKF1",
+      "sme_rate": 50.8,
+      "n": 311
+    },
+    {
+      "region": "UKE41",
+      "sme_rate": 50.7,
+      "n": 612
+    },
+    {
+      "region": "UKC13",
+      "sme_rate": 50.6,
+      "n": 350
+    },
+    {
+      "region": "UKJ34",
+      "sme_rate": 50.5,
+      "n": 182
+    },
+    {
+      "region": "UKI61",
+      "sme_rate": 50.4,
+      "n": 137
+    },
+    {
+      "region": "UKJ14",
+      "sme_rate": 50.2,
+      "n": 1073
+    },
+    {
+      "region": "UKH3",
+      "sme_rate": 50.1,
+      "n": 503
+    },
+    {
+      "region": "UKJ4",
+      "sme_rate": 50.0,
+      "n": 310
+    },
+    {
+      "region": "UKD3",
+      "sme_rate": 49.9,
+      "n": 575
+    },
+    {
+      "region": "UKD33",
+      "sme_rate": 49.9,
+      "n": 693
+    },
+    {
+      "region": "UKK4",
+      "sme_rate": 49.8,
+      "n": 229
+    },
+    {
+      "region": "UKM95",
+      "sme_rate": 49.7,
+      "n": 143
+    },
+    {
+      "region": "UKC11",
+      "sme_rate": 49.6,
+      "n": 284
+    },
+    {
+      "region": "UKI31",
+      "sme_rate": 49.6,
+      "n": 1275
+    },
+    {
+      "region": "UKK14",
+      "sme_rate": 49.6,
+      "n": 2567
+    },
+    {
+      "region": "UKJ22",
+      "sme_rate": 49.4,
+      "n": 271
+    },
+    {
+      "region": "UKD6",
+      "sme_rate": 49.3,
+      "n": 152
+    },
+    {
+      "region": "UKI62",
+      "sme_rate": 49.2,
+      "n": 122
+    },
+    {
+      "region": "UKG33",
+      "sme_rate": 49.1,
+      "n": 580
+    },
+    {
+      "region": "UKH14",
+      "sme_rate": 49.0,
+      "n": 673
+    },
+    {
+      "region": "UKJ21",
+      "sme_rate": 48.9,
+      "n": 235
+    },
+    {
+      "region": "UKD7",
+      "sme_rate": 48.7,
+      "n": 267
+    },
+    {
+      "region": "UKD1",
+      "sme_rate": 48.4,
+      "n": 246
+    },
+    {
+      "region": "UKJ25",
+      "sme_rate": 48.4,
+      "n": 463
+    },
+    {
+      "region": "UKH23",
+      "sme_rate": 48.2,
+      "n": 1038
+    },
+    {
+      "region": "UKH25",
+      "sme_rate": 47.7,
+      "n": 130
+    },
+    {
+      "region": "UKI",
+      "sme_rate": 47.7,
+      "n": 2342
+    },
+    {
+      "region": "UKL15",
+      "sme_rate": 47.7,
+      "n": 436
+    },
+    {
+      "region": "UKC22",
+      "sme_rate": 47.4,
+      "n": 1101
+    },
+    {
+      "region": "UKI71",
+      "sme_rate": 47.4,
+      "n": 95
+    },
+    {
+      "region": "UKJ26",
+      "sme_rate": 47.4,
+      "n": 171
+    },
+    {
+      "region": "UKM81",
+      "sme_rate": 47.4,
+      "n": 114
+    },
+    {
+      "region": "UKJ",
+      "sme_rate": 47.2,
+      "n": 341
+    },
+    {
+      "region": "UKI44",
+      "sme_rate": 47.1,
+      "n": 647
+    },
+    {
+      "region": "UKE21",
+      "sme_rate": 47.0,
+      "n": 353
+    },
+    {
+      "region": "UKD34",
+      "sme_rate": 46.8,
+      "n": 222
+    },
+    {
+      "region": "UKI32",
+      "sme_rate": 46.8,
+      "n": 3433
+    },
+    {
+      "region": "UKH15",
+      "sme_rate": 46.0,
+      "n": 1211
+    },
+    {
+      "region": "UKH",
+      "sme_rate": 45.9,
+      "n": 172
+    },
+    {
+      "region": "UKK3",
+      "sme_rate": 45.6,
+      "n": 103
+    },
+    {
+      "region": "UKJ3",
+      "sme_rate": 45.5,
+      "n": 176
+    },
+    {
+      "region": "UKG",
+      "sme_rate": 45.4,
+      "n": 355
+    },
+    {
+      "region": "UKG32",
+      "sme_rate": 45.1,
+      "n": 102
+    },
+    {
+      "region": "UKI33",
+      "sme_rate": 45.1,
+      "n": 215
+    },
+    {
+      "region": "UKJ2",
+      "sme_rate": 45.1,
+      "n": 366
+    },
+    {
+      "region": "UKK23",
+      "sme_rate": 45.1,
+      "n": 623
+    },
+    {
+      "region": "UKJ12",
+      "sme_rate": 45.0,
+      "n": 342
+    },
+    {
+      "region": "UK",
+      "sme_rate": 44.8,
+      "n": 13361
+    },
+    {
+      "region": "UKD",
+      "sme_rate": 44.8,
+      "n": 475
+    },
+    {
+      "region": "UKD72",
+      "sme_rate": 44.7,
+      "n": 530
+    },
+    {
+      "region": "UKI75",
+      "sme_rate": 44.1,
+      "n": 510
+    },
+    {
+      "region": "UKE",
+      "sme_rate": 44.0,
+      "n": 657
+    },
+    {
+      "region": "UKG39",
+      "sme_rate": 44.0,
+      "n": 182
+    },
+    {
+      "region": "UKN06",
+      "sme_rate": 43.5,
+      "n": 926
+    },
+    {
+      "region": "UKK1",
+      "sme_rate": 43.3,
+      "n": 270
+    },
+    {
+      "region": "UKC12",
+      "sme_rate": 43.1,
+      "n": 418
+    },
+    {
+      "region": "UKJ1",
+      "sme_rate": 42.9,
+      "n": 252
+    },
+    {
+      "region": "UKI42",
+      "sme_rate": 42.7,
+      "n": 733
+    },
+    {
+      "region": "UKD61",
+      "sme_rate": 42.6,
+      "n": 1015
+    },
+    {
+      "region": "UKM",
+      "sme_rate": 42.6,
+      "n": 1808
+    },
+    {
+      "region": "UKC2",
+      "sme_rate": 42.4,
+      "n": 66
+    },
+    {
+      "region": "UKG22",
+      "sme_rate": 42.2,
+      "n": 204
+    },
+    {
+      "region": "UKI3",
+      "sme_rate": 42.1,
+      "n": 76
+    },
+    {
+      "region": "UKM8",
+      "sme_rate": 41.7,
+      "n": 72
+    },
+    {
+      "region": "UKK24",
+      "sme_rate": 40.9,
+      "n": 276
+    },
+    {
+      "region": "UKE42",
+      "sme_rate": 36.3,
+      "n": 959
+    },
+    {
+      "region": "UKH17",
+      "sme_rate": 35.1,
+      "n": 114
+    },
+    {
+      "region": "UKH12",
+      "sme_rate": 33.9,
+      "n": 1050
+    },
+    {
+      "region": "UKK11",
+      "sme_rate": 33.2,
+      "n": 1471
+    },
+    {
+      "region": "UKI54",
+      "sme_rate": 32.4,
+      "n": 207
+    },
+    {
+      "region": "UKF2",
+      "sme_rate": 30.2,
+      "n": 162
+    },
+    {
+      "region": "UKH35",
+      "sme_rate": 25.0,
+      "n": 88
+    },
+    {
+      "region": "UKC",
+      "sme_rate": 24.8,
+      "n": 1306
+    },
+    {
+      "region": "UKH37",
+      "sme_rate": 24.6,
+      "n": 114
+    },
+    {
+      "region": "UKF16",
+      "sme_rate": 23.2,
+      "n": 177
+    },
+    {
+      "region": "UKD11",
+      "sme_rate": 21.7,
+      "n": 115
+    },
+    {
+      "region": "UKI45",
+      "sme_rate": 13.2,
+      "n": 923
+    }
+  ],
+  "top_sectors": [
+    {
+      "sector": "Project-supervision services other than for construction wor",
+      "sme_rate": 99.8,
+      "n": 6552
+    },
+    {
+      "sector": "Non-scheduled passenger transport",
+      "sme_rate": 86.2,
+      "n": 1406
+    },
+    {
+      "sector": "In vitro fertilisation services",
+      "sme_rate": 85.0,
+      "n": 127
+    },
+    {
+      "sector": "Equal opportunities consultancy services",
+      "sme_rate": 79.9,
+      "n": 149
+    },
+    {
+      "sector": "General-practitioner services",
+      "sme_rate": 79.5,
+      "n": 885
+    },
+    {
+      "sector": "Refurbishment of run-down buildings",
+      "sme_rate": 76.9,
+      "n": 502
+    },
+    {
+      "sector": "Fire-alarm system installation work",
+      "sme_rate": 75.5,
+      "n": 151
+    },
+    {
+      "sector": "Motion picture and video services",
+      "sme_rate": 75.2,
+      "n": 145
+    },
+    {
+      "sector": "Special-purpose road passenger-transport services",
+      "sme_rate": 74.9,
+      "n": 323
+    },
+    {
+      "sector": "Boiler installation work",
+      "sme_rate": 74.7,
+      "n": 288
+    },
+    {
+      "sector": "Community action programme",
+      "sme_rate": 74.7,
+      "n": 328
+    },
+    {
+      "sector": "Scaffolding work",
+      "sme_rate": 74.5,
+      "n": 106
+    },
+    {
+      "sector": "Agricultural, forestry, horticultural, aquacultural and apic",
+      "sme_rate": 74.4,
+      "n": 905
+    },
+    {
+      "sector": "Dog kennel services",
+      "sme_rate": 74.3,
+      "n": 404
+    },
+    {
+      "sector": "Cleaning and sanitation services in urban or rural areas, an",
+      "sme_rate": 74.1,
+      "n": 189
+    }
+  ],
+  "source_by_year": [
+    {
+      "year": 2016,
+      "cf": 56697,
+      "fts": 0
+    },
+    {
+      "year": 2017,
+      "cf": 40544,
+      "fts": 0
+    },
+    {
+      "year": 2018,
+      "cf": 47109,
+      "fts": 0
+    },
+    {
+      "year": 2019,
+      "cf": 50342,
+      "fts": 0
+    },
+    {
+      "year": 2020,
+      "cf": 45917,
+      "fts": 0
+    },
+    {
+      "year": 2021,
+      "cf": 64183,
+      "fts": 21609
+    },
+    {
+      "year": 2022,
+      "cf": 68584,
+      "fts": 24456
+    },
+    {
+      "year": 2023,
+      "cf": 76706,
+      "fts": 24036
+    },
+    {
+      "year": 2024,
+      "cf": 74037,
+      "fts": 26040
+    },
+    {
+      "year": 2025,
+      "cf": 49479,
+      "fts": 54131
+    },
+    {
+      "year": 2026,
+      "cf": 7483,
+      "fts": 24596
+    }
+  ],
+  "national_avg_sme_rate": 50.2,
+  "regression": {
+    "slope": 1.56,
+    "r_squared": 0.4481
+  }
+}

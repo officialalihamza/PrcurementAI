@@ -1,0 +1,26 @@
+# Python
+__pycache__/
+*.py[cod]
+*.pyo
+.env
+*.egg-info/
+dist/
+.venv/
+venv/
+env/
+
+# Node
+frontend/node_modules/
+frontend/dist/
+frontend/.vite/
+
+# Large data files — NEVER commit these (976 MB)
+../../Data/
+../Data/
+Data/
+*.csv
+*.jsonl
+*.jsonl.gz
+
+# Keep the pre-computed analytics cache (small JSON, ~20 KB)
+!backend/analytics_cache.json
