@@ -13,12 +13,13 @@ app = FastAPI(
     version="1.0.0",
 )
 
-origins = os.getenv("ALLOWED_ORIGINS", "*").split(",")
+_raw_origins = os.getenv("ALLOWED_ORIGINS", "").strip()
+origins = [o.strip() for o in _raw_origins.split(",") if o.strip()] if _raw_origins else ["*"]
 
 app.add_middleware(
     CORSMiddleware,
     allow_origins=origins,
-    allow_credentials=True,
+    allow_credentials=False,   # app uses Bearer tokens, not cookies — wildcard + credentials is invalid
     allow_methods=["*"],
     allow_headers=["*"],
 )
