@@ -31,13 +31,19 @@
 
       <div class="card p-4">
         <p class="text-xs font-medium text-gray-500 uppercase tracking-wide">SME Suitable</p>
-        <p class="mt-1 text-2xl font-bold text-emerald-600">{{ kpis.sme_count != null ? kpis.sme_count : '—' }}</p>
-        <p class="mt-0.5 text-xs text-gray-400">Of {{ kpis.total_fetched ?? '—' }} fetched</p>
+        <p class="mt-1 text-2xl font-bold text-emerald-600">
+          <span v-if="loading" class="animate-pulse bg-gray-200 rounded h-7 w-10 inline-block align-middle"></span>
+          <span v-else>{{ kpis.sme_count ?? 0 }}</span>
+        </p>
+        <p class="mt-0.5 text-xs text-gray-400">Of {{ kpis.total_fetched ?? 100 }} fetched</p>
       </div>
 
       <div class="card p-4">
         <p class="text-xs font-medium text-gray-500 uppercase tracking-wide">Unique Buyers</p>
-        <p class="mt-1 text-2xl font-bold text-indigo-600">{{ kpis.unique_buyers ?? '—' }}</p>
+        <p class="mt-1 text-2xl font-bold text-indigo-600">
+          <span v-if="loading" class="animate-pulse bg-gray-200 rounded h-7 w-10 inline-block align-middle"></span>
+          <span v-else>{{ kpis.unique_buyers ?? 0 }}</span>
+        </p>
         <p class="mt-0.5 text-xs text-gray-400">Active authorities</p>
       </div>
 
@@ -128,9 +134,31 @@
     <div class="card overflow-hidden">
       <div class="px-5 py-4 border-b border-gray-100 flex items-center justify-between">
         <h3 class="font-semibold text-gray-900">Recently Published Contracts</h3>
-        <RouterLink to="/contracts" class="text-sm text-brand-600 hover:text-brand-800 font-medium">View all →</RouterLink>
+        <div class="flex items-center gap-3">
+          <button @click="fetchStats(true)" :disabled="loading"
+            class="text-xs text-gray-400 hover:text-brand-600 transition-colors disabled:opacity-40 flex items-center gap-1">
+            <svg class="w-3.5 h-3.5" :class="loading ? 'animate-spin' : ''" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+              <path stroke-linecap="round" stroke-linejoin="round" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15"/>
+            </svg>
+            Refresh
+          </button>
+          <RouterLink to="/contracts" class="text-sm text-brand-600 hover:text-brand-800 font-medium">View all →</RouterLink>
+        </div>
       </div>
-      <div v-if="recentContracts.length">
+
+      <!-- Skeleton while loading -->
+      <div v-if="loading">
+        <div v-for="i in 5" :key="i" class="px-5 py-3 border-b border-gray-50 flex items-center gap-4 animate-pulse">
+          <div class="flex-1 space-y-1.5">
+            <div class="h-3.5 bg-gray-200 rounded w-3/4"></div>
+            <div class="h-2.5 bg-gray-100 rounded w-1/3"></div>
+          </div>
+          <div class="h-3.5 bg-gray-200 rounded w-20 hidden sm:block"></div>
+          <div class="h-3.5 bg-gray-100 rounded w-16 hidden md:block"></div>
+        </div>
+      </div>
+
+      <div v-else-if="recentContracts.length">
         <table class="w-full text-sm">
           <tbody>
             <tr
@@ -165,9 +193,11 @@
           </tbody>
         </table>
       </div>
-      <div v-else class="px-5 py-8 text-center text-gray-400 text-sm">
+
+      <div v-else class="px-5 py-8 text-center text-sm">
         <svg class="w-8 h-8 mx-auto mb-2 text-gray-300" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"/></svg>
-        No recent contracts loaded yet
+        <p class="text-gray-400 mb-2">Data may be cached from a previous session.</p>
+        <button @click="fetchStats(true)" class="text-brand-600 hover:text-brand-800 font-medium text-sm">Click to refresh →</button>
       </div>
     </div>
 
@@ -452,11 +482,11 @@ const clusters = [
 
 // ── Data fetch ───────────────────────────────────────────────────────────────
 
-async function fetchStats() {
+async function fetchStats(force = false) {
   loading.value = true
   apiError.value = ''
   try {
-    const res = await dashboardApi.getStats()
+    const res = await dashboardApi.getStats(force)
     stats.value = res.data
   } catch (e) {
     const status = e.response?.status

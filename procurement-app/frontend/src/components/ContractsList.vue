@@ -43,7 +43,7 @@
             <td class="px-4 py-3 text-center">
               <span v-if="contract.sme_suitable === true" class="badge-sme">SME</span>
               <span v-else-if="contract.sme_suitable === false" class="badge-large">Large</span>
-              <span v-else class="text-gray-400 text-xs">—</span>
+              <span v-else class="text-gray-300 text-xs" title="SME suitability not specified in this notice">—</span>
             </td>
             <td class="px-4 py-3 text-center">
               <span v-if="contract.documents?.length"
@@ -68,7 +68,7 @@
                   {{ contract.match_score }}
                 </span>
               </div>
-              <span v-else class="text-gray-400 text-xs">—</span>
+              <span v-else class="text-gray-300 text-xs" title="Complete your company profile with SIC codes to see match scores">—</span>
             </td>
             <td class="px-4 py-3" @click.stop>
               <button
@@ -138,7 +138,7 @@
                 <p class="text-xs text-gray-500 uppercase tracking-wide">SME Suitable</p>
                 <span v-if="selected.sme_suitable === true" class="badge-sme">Yes</span>
                 <span v-else-if="selected.sme_suitable === false" class="badge-large">No</span>
-                <span v-else class="text-gray-500">Not specified</span>
+                <span v-else class="text-xs text-gray-400 italic">Not specified in notice</span>
               </div>
               <div class="space-y-1">
                 <p class="text-xs text-gray-500 uppercase tracking-wide">Status</p>

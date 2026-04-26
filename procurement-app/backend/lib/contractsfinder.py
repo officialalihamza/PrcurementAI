@@ -87,9 +87,14 @@ def _parse_release(release: dict) -> Optional[dict]:
                         prefix = code[:2]
                         cpv_descs.append(CPV_DESCRIPTIONS.get(prefix, classification.get("description", "")))
 
-        sme_suitable = tender.get("suitableForSme", None)
-        if sme_suitable is None:
-            sme_suitable = tender.get("SMEsuitable", None)
+        sme_suitable = (
+            tender.get("suitableForSme") or
+            tender.get("SMEsuitable") or
+            tender.get("suitableForSME") or
+            tender.get("isSMESuitable")
+        )
+        if isinstance(sme_suitable, str):
+            sme_suitable = True if sme_suitable.lower() == "true" else (False if sme_suitable.lower() == "false" else None)
 
         region = buyer_region
         if not region and buyer_region:
@@ -272,13 +277,14 @@ def _apply_match_scores(contracts: List[dict], company_profile: Optional[dict]):
         c["match_score"] = _calc_match_score(c, company_profile)
 
 
-def get_stats(filters: Optional[dict] = None) -> Dict[str, Any]:
-    """Fetch aggregated stats for dashboard KPIs."""
+def get_stats(filters: Optional[dict] = None, force: bool = False) -> Dict[str, Any]:
+    """Fetch aggregated stats for dashboard KPIs. Pass force=True to bypass cache."""
     params_dict = {"type": "stats", **(filters or {})}
     key = _cache_key(params_dict)
-    cached = _cache_get(key)
-    if cached:
-        return cached
+    if not force:
+        cached = _cache_get(key)
+        if cached:
+            return cached
 
     try:
         resp = requests.get(CF_API_URL, params={"size": 100, "page": 1}, timeout=15)

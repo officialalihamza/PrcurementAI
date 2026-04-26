@@ -56,7 +56,7 @@ export const contractsApi = {
 
 // Dashboard
 export const dashboardApi = {
-  getStats: () => api.get('/dashboard/stats'),
+  getStats: (force = false) => api.get('/dashboard/stats', { params: force ? { force: true } : {} }),
   getEda: () => api.get('/dashboard/eda', { timeout: 90000 }),
   exportPdf: () => api.get('/dashboard/eda/export', { responseType: 'blob', timeout: 90000 }),
 }
