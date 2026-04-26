@@ -71,43 +71,6 @@
       </div>
     </section>
 
-    <!-- Pricing -->
-    <section class="py-20 px-4 bg-gray-50">
-      <div class="max-w-4xl mx-auto text-center">
-        <h2 class="text-3xl font-bold text-gray-900 mb-4">Simple, transparent pricing</h2>
-        <p class="text-gray-500 mb-12">Start free, upgrade when you need more</p>
-
-        <div class="grid grid-cols-1 md:grid-cols-2 gap-6 max-w-2xl mx-auto">
-          <div class="card p-8 text-left">
-            <p class="text-sm font-semibold text-gray-500 uppercase tracking-wide mb-2">Free</p>
-            <p class="text-4xl font-bold text-gray-900 mb-1">£0</p>
-            <p class="text-gray-500 text-sm mb-6">Forever free</p>
-            <ul class="space-y-2 mb-8">
-              <li v-for="f in freePlan" :key="f" class="flex gap-2 text-sm text-gray-700">
-                <span class="text-green-500 font-bold">✓</span> {{ f }}
-              </li>
-            </ul>
-            <RouterLink to="/signup" class="btn-secondary w-full text-center">Get started</RouterLink>
-          </div>
-
-          <div class="card p-8 text-left border-brand-500 ring-2 ring-brand-500">
-            <div class="flex items-center justify-between mb-2">
-              <p class="text-sm font-semibold text-brand-600 uppercase tracking-wide">Pro</p>
-              <span class="px-2 py-0.5 bg-brand-100 text-brand-700 text-xs font-medium rounded">Popular</span>
-            </div>
-            <p class="text-4xl font-bold text-gray-900 mb-1">£29<span class="text-lg text-gray-400 font-normal">/mo</span></p>
-            <p class="text-gray-500 text-sm mb-6">Billed monthly</p>
-            <ul class="space-y-2 mb-8">
-              <li v-for="f in proPlan" :key="f" class="flex gap-2 text-sm text-gray-700">
-                <span class="text-brand-500 font-bold">✓</span> {{ f }}
-              </li>
-            </ul>
-            <RouterLink to="/signup" class="btn-primary w-full text-center">Start free trial</RouterLink>
-          </div>
-        </div>
-      </div>
-    </section>
-
     <!-- CTA -->
     <section class="py-20 px-4 bg-brand-700 text-white text-center">
       <h2 class="text-3xl font-bold mb-4">Start finding contracts today</h2>
@@ -147,19 +110,4 @@ const steps = [
   { title: 'Find and get alerted to contracts', desc: 'Search live UK Contracts Finder data and set up alerts for ongoing monitoring.' },
 ]
 
-const freePlan = [
-  'Unlimited contract search',
-  'Up to 3 saved alerts',
-  'Save up to 20 contracts',
-  'Basic analytics dashboard',
-]
-
-const proPlan = [
-  'Everything in Free',
-  'Unlimited alerts',
-  'Unlimited saved contracts',
-  'Full EDA analytics suite',
-  'PDF report export',
-  'Priority email support',
-]
 </script>

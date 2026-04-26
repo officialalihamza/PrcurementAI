@@ -1,13 +1,25 @@
 <template>
   <div class="min-h-screen bg-gray-50">
-    <Navbar v-if="showNav" />
-    <main :class="showNav ? 'pt-16' : ''">
+    <!-- Authenticated app shell: sidebar + content -->
+    <template v-if="showSidebar">
+      <Sidebar />
+      <div class="lg:ml-60 min-h-screen">
+        <RouterView v-slot="{ Component }">
+          <Transition name="fade" mode="out-in">
+            <component :is="Component" />
+          </Transition>
+        </RouterView>
+      </div>
+    </template>
+
+    <!-- Public pages (Home, Login, Signup): no sidebar -->
+    <template v-else>
       <RouterView v-slot="{ Component }">
         <Transition name="fade" mode="out-in">
           <component :is="Component" />
         </Transition>
       </RouterView>
-    </main>
+    </template>
   </div>
 </template>
 
@@ -15,12 +27,14 @@
 import { computed, onMounted } from 'vue'
 import { useRoute } from 'vue-router'
 import { useUserStore } from '@/stores/user'
-import Navbar from '@/components/Navbar.vue'
+import Sidebar from '@/components/Sidebar.vue'
 
-const route = useRoute()
+const route     = useRoute()
 const userStore = useUserStore()
 
-const showNav = computed(() => !route.meta.public || userStore.isAuthenticated)
+const showSidebar = computed(
+  () => userStore.isAuthenticated && !!route.meta.requiresAuth
+)
 
 onMounted(async () => {
   await userStore.init()
