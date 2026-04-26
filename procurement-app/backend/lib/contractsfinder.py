@@ -217,8 +217,11 @@ def search(
         _apply_match_scores(cached["contracts"], company_profile)
         return cached
 
+    # Fetch more when filtering client-side (status/region) so results aren't sparse
+    needs_client_filter = bool(regions or (status_filter and status_filter != "all"))
+    fetch_size = 100 if needs_client_filter else min(page_size * 2, 100)
     query_params = {
-        "size": min(page_size * 2, 100),
+        "size": fetch_size,
         "page": page,
     }
 
@@ -252,8 +255,11 @@ def search(
     for release in releases:
         parsed = _parse_release(release)
         if parsed:
-            if regions and parsed["region"] not in regions and parsed["buyer_region"] not in regions:
-                continue
+            # Region: case-insensitive substring match so "London" matches "City of London" etc.
+            if regions:
+                location = ((parsed.get("region") or "") + " " + (parsed.get("buyer_region") or "")).lower()
+                if not any(r.lower() in location for r in regions):
+                    continue
             if sme_flag == "sme" and parsed["sme_suitable"] is False:
                 continue
             if sme_flag == "large" and parsed["sme_suitable"] is True:

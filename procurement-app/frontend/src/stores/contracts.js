@@ -2,23 +2,25 @@ import { defineStore } from 'pinia'
 import { ref } from 'vue'
 import { contractsApi } from '@/lib/api'
 
+const DEFAULT_FILTERS = {
+  keyword: '',
+  cpv: [],
+  regions: [],
+  value_min: 0,
+  value_max: 10000000,
+  sme_flag: 'all',
+  status_filter: 'active',
+  sort: 'newest',
+  page: 1,
+}
+
 export const useContractsStore = defineStore('contracts', () => {
   const contracts = ref([])
   const savedContracts = ref([])
   const total = ref(0)
   const loading = ref(false)
   const error = ref(null)
-  const filters = ref({
-    keyword: '',
-    cpv: [],
-    regions: [],
-    value_min: 0,
-    value_max: 10000000,
-    sme_flag: 'all',
-    status_filter: 'all',
-    sort: 'newest',
-    page: 1,
-  })
+  const filters = ref({ ...DEFAULT_FILTERS })
 
   async function search(params = {}) {
     loading.value = true
@@ -61,17 +63,7 @@ export const useContractsStore = defineStore('contracts', () => {
   }
 
   function resetFilters() {
-    filters.value = {
-      keyword: '',
-      cpv: [],
-      regions: [],
-      value_min: 0,
-      value_max: 10000000,
-      sme_flag: 'all',
-      status_filter: 'all',
-      sort: 'newest',
-      page: 1,
-    }
+    filters.value = { ...DEFAULT_FILTERS }
   }
 
   return {

@@ -12,16 +12,14 @@
           {{ activeTab === 'search' ? store.total.toLocaleString() + ' results' : store.savedContracts.length + ' saved' }}
         </p>
         <div class="flex rounded-lg border border-gray-200 overflow-hidden text-sm">
-          <button
-            @click="activeTab = 'search'"
+          <button @click="activeTab = 'search'"
             class="px-4 py-1.5 font-medium transition-colors"
-            :class="activeTab === 'search' ? 'bg-brand-600 text-white' : 'bg-white text-gray-600 hover:bg-gray-50'"
-          >Search</button>
-          <button
-            @click="activeTab = 'saved'; store.fetchSaved()"
+            :class="activeTab === 'search' ? 'bg-brand-600 text-white' : 'bg-white text-gray-600 hover:bg-gray-50'">
+            Search
+          </button>
+          <button @click="activeTab = 'saved'; store.fetchSaved()"
             class="px-4 py-1.5 font-medium transition-colors flex items-center gap-1.5"
-            :class="activeTab === 'saved' ? 'bg-brand-600 text-white' : 'bg-white text-gray-600 hover:bg-gray-50'"
-          >
+            :class="activeTab === 'saved' ? 'bg-brand-600 text-white' : 'bg-white text-gray-600 hover:bg-gray-50'">
             Saved
             <span v-if="store.savedContracts.length" class="px-1.5 py-0.5 rounded-full text-xs"
               :class="activeTab === 'saved' ? 'bg-white/20' : 'bg-brand-100 text-brand-700'">
@@ -32,50 +30,92 @@
       </div>
     </div>
 
-    <!-- ── Top Filter Bar (search tab only) ── -->
-    <div v-if="activeTab === 'search'" class="card p-4 mb-5">
-      <!-- Row 1: keyword + search button -->
-      <div class="flex gap-3 mb-3">
-        <div class="flex-1">
-          <input
-            v-model="filters.keyword"
-            type="search"
-            class="input w-full"
-            placeholder="Search by keyword, buyer, or title…"
-            @keyup.enter="doSearch"
-          />
-        </div>
-        <button @click="doSearch" class="btn-primary px-5 text-sm whitespace-nowrap">Search</button>
+    <!-- ── Filter Bar ── -->
+    <div v-if="activeTab === 'search'" class="card p-4 mb-5 space-y-4">
+
+      <!-- Row 1: Keyword search -->
+      <div class="flex gap-3">
+        <input
+          v-model="filters.keyword"
+          type="search"
+          class="input flex-1"
+          placeholder="Search by keyword, buyer, or title…"
+          @keyup.enter="doSearch"
+        />
+        <button @click="doSearch" class="btn-primary px-6 text-sm whitespace-nowrap">Search</button>
         <button @click="resetFilters" class="btn-secondary px-4 text-sm whitespace-nowrap">Reset</button>
       </div>
 
-      <!-- Row 2: filters grid (8 cols on xl, 4 on lg, 2 on sm) -->
-      <div class="grid grid-cols-2 sm:grid-cols-4 xl:grid-cols-8 gap-3">
-        <div>
-          <label class="label text-xs">Region</label>
-          <select v-model="filters.region" class="input text-sm py-1.5">
-            <option value="">All regions</option>
-            <option v-for="r in regions" :key="r" :value="r">{{ r }}</option>
-          </select>
-        </div>
+      <!-- Row 2: Status pill tabs -->
+      <div class="flex items-center gap-2 flex-wrap">
+        <span class="text-xs font-semibold text-gray-500 uppercase tracking-wide mr-1">Status:</span>
+        <button
+          v-for="opt in statusOptions" :key="opt.value"
+          @click="filters.status_filter = opt.value"
+          class="px-3.5 py-1.5 rounded-full text-xs font-medium border transition-all"
+          :class="filters.status_filter === opt.value
+            ? opt.activeClass
+            : 'bg-white text-gray-600 border-gray-200 hover:border-gray-400 hover:text-gray-800'"
+        >
+          <span v-if="opt.dot" class="inline-block w-1.5 h-1.5 rounded-full mr-1.5 -mb-px" :class="opt.dot"></span>
+          {{ opt.label }}
+        </button>
+      </div>
 
+      <!-- Row 3: Primary filters -->
+      <div class="grid grid-cols-2 sm:grid-cols-4 gap-3">
         <div>
-          <label class="label text-xs">Status</label>
-          <select v-model="filters.status_filter" class="input text-sm py-1.5">
-            <option value="all">All statuses</option>
-            <option value="active">Open / Active</option>
-            <option value="complete">Awarded / Complete</option>
-            <option value="cancelled">Cancelled</option>
-          </select>
+          <label class="label text-xs">Location / City</label>
+          <input
+            v-model="filters.region"
+            type="text"
+            class="input text-sm py-1.5"
+            placeholder="e.g. London, Manchester…"
+            @keyup.enter="doSearch"
+          />
         </div>
-
         <div>
           <label class="label text-xs">SME suitability</label>
           <select v-model="filters.sme_flag" class="input text-sm py-1.5">
             <option v-for="opt in smeOptions" :key="opt.value" :value="opt.value">{{ opt.label }}</option>
           </select>
         </div>
+        <div>
+          <label class="label text-xs">Sort by</label>
+          <select v-model="filters.sort" class="input text-sm py-1.5">
+            <option value="newest">Newest first</option>
+            <option value="value">Highest value</option>
+            <option value="deadline">Deadline soon</option>
+          </select>
+        </div>
+        <div class="flex items-end">
+          <button
+            @click="showMore = !showMore"
+            class="w-full btn-secondary text-sm py-1.5 flex items-center justify-center gap-2"
+          >
+            <svg class="w-3.5 h-3.5 transition-transform" :class="showMore ? 'rotate-180' : ''" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2.5">
+              <path stroke-linecap="round" stroke-linejoin="round" d="M19 9l-7 7-7-7"/>
+            </svg>
+            {{ showMore ? 'Fewer filters' : 'More filters' }}
+            <span v-if="activeMoreCount" class="ml-1 px-1.5 py-0.5 bg-brand-100 text-brand-700 rounded-full text-xs">{{ activeMoreCount }}</span>
+          </button>
+        </div>
+      </div>
 
+      <!-- Row 4: Expandable advanced filters -->
+      <div v-if="showMore" class="grid grid-cols-2 sm:grid-cols-4 gap-3 pt-3 border-t border-gray-100">
+        <div>
+          <label class="label text-xs">Min value (£)</label>
+          <input v-model.number="filters.value_min" type="number" class="input text-sm py-1.5" placeholder="0" />
+        </div>
+        <div>
+          <label class="label text-xs">Max value (£)</label>
+          <input v-model.number="filters.value_max" type="number" class="input text-sm py-1.5" placeholder="No limit" />
+        </div>
+        <div>
+          <label class="label text-xs">Published from</label>
+          <input v-model="filters.date_from" type="date" class="input text-sm py-1.5" />
+        </div>
         <div>
           <label class="label text-xs">CPV code</label>
           <input
@@ -86,31 +126,8 @@
             @keyup.enter="doSearch"
           />
         </div>
-
-        <div>
-          <label class="label text-xs">Min value (£)</label>
-          <input v-model.number="filters.value_min" type="number" class="input text-sm py-1.5" placeholder="0" />
-        </div>
-
-        <div>
-          <label class="label text-xs">Max value (£)</label>
-          <input v-model.number="filters.value_max" type="number" class="input text-sm py-1.5" placeholder="No limit" />
-        </div>
-
-        <div>
-          <label class="label text-xs">Date from</label>
-          <input v-model="filters.date_from" type="date" class="input text-sm py-1.5" />
-        </div>
-
-        <div>
-          <label class="label text-xs">Sort by</label>
-          <select v-model="filters.sort" class="input text-sm py-1.5">
-            <option value="newest">Newest first</option>
-            <option value="value">Highest value</option>
-            <option value="deadline">Deadline soon</option>
-          </select>
-        </div>
       </div>
+
     </div>
 
     <!-- ── Saved Contracts Tab ── -->
@@ -165,17 +182,11 @@
       </div>
 
       <div v-if="store.total > 0" class="mt-4 flex items-center justify-between text-sm text-gray-600">
-        <button
-          :disabled="currentPage <= 1"
-          @click="changePage(-1)"
-          class="btn-secondary py-1.5 px-3 disabled:opacity-40"
-        >
+        <button :disabled="currentPage <= 1" @click="changePage(-1)" class="btn-secondary py-1.5 px-3 disabled:opacity-40">
           &larr; Previous
         </button>
         <span>Page {{ currentPage }} &nbsp;&middot;&nbsp; {{ store.total.toLocaleString() }} results</span>
-        <button @click="changePage(1)" class="btn-secondary py-1.5 px-3">
-          Next &rarr;
-        </button>
+        <button @click="changePage(1)" class="btn-secondary py-1.5 px-3">Next &rarr;</button>
       </div>
     </div>
 
@@ -183,7 +194,7 @@
 </template>
 
 <script setup>
-import { ref, reactive, onMounted } from 'vue'
+import { ref, reactive, computed, onMounted } from 'vue'
 import { useRoute } from 'vue-router'
 import { useContractsStore } from '@/stores/contracts'
 import ContractsList from '@/components/ContractsList.vue'
@@ -192,16 +203,18 @@ const route = useRoute()
 const store = useContractsStore()
 const currentPage = ref(1)
 const activeTab   = ref('search')
+const showMore    = ref(false)
 
-const regions = [
-  'East Midlands', 'East of England', 'London', 'North East',
-  'North West', 'Northern Ireland', 'Scotland', 'South East',
-  'South West', 'Wales', 'West Midlands', 'Yorkshire and the Humber',
+const statusOptions = [
+  { value: 'active',    label: 'Active / Open', dot: 'bg-green-500',  activeClass: 'bg-green-600 text-white border-green-600' },
+  { value: 'complete',  label: 'Awarded',        dot: 'bg-blue-500',   activeClass: 'bg-blue-600 text-white border-blue-600' },
+  { value: 'cancelled', label: 'Cancelled',       dot: 'bg-red-400',    activeClass: 'bg-red-600 text-white border-red-600' },
+  { value: 'all',       label: 'All statuses',   dot: null,            activeClass: 'bg-gray-800 text-white border-gray-800' },
 ]
 
 const smeOptions = [
-  { value: 'all', label: 'All contracts' },
-  { value: 'sme', label: 'SME suitable' },
+  { value: 'all',   label: 'All contracts' },
+  { value: 'sme',   label: 'SME suitable' },
   { value: 'large', label: 'Large only' },
 ]
 
@@ -211,20 +224,36 @@ const filters = reactive({
   value_min:     0,
   value_max:     10000000,
   sme_flag:      'all',
-  status_filter: 'all',
+  status_filter: 'active',
   cpv_code:      '',
   sort:          'newest',
   date_from:     '',
   date_to:       '',
 })
 
+// Count how many "more filters" are actively set (for the badge)
+const activeMoreCount = computed(() => {
+  let n = 0
+  if (filters.value_min > 0) n++
+  if (filters.value_max < 10000000) n++
+  if (filters.date_from) n++
+  if (filters.cpv_code) n++
+  return n
+})
+
 async function doSearch() {
   currentPage.value = 1
   store.setFilters({
-    ...filters,
-    regions:       filters.region   ? [filters.region]   : [],
+    keyword:       filters.keyword,
+    regions:       filters.region ? [filters.region] : [],
     cpv:           filters.cpv_code ? [filters.cpv_code] : [],
+    value_min:     filters.value_min,
+    value_max:     filters.value_max,
+    sme_flag:      filters.sme_flag,
     status_filter: filters.status_filter,
+    sort:          filters.sort,
+    date_from:     filters.date_from,
+    date_to:       filters.date_to,
     page: 1,
   })
   await store.search()
@@ -234,9 +263,10 @@ async function doSearch() {
 function resetFilters() {
   Object.assign(filters, {
     keyword: '', region: '', value_min: 0, value_max: 10000000,
-    sme_flag: 'all', status_filter: 'all', cpv_code: '',
+    sme_flag: 'all', status_filter: 'active', cpv_code: '',
     sort: 'newest', date_from: '', date_to: '',
   })
+  showMore.value = false
   doSearch()
 }
 
