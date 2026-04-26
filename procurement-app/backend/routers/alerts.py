@@ -1,15 +1,17 @@
 from fastapi import APIRouter, Depends, HTTPException
-from lib.supabase import get_current_user, get_user_client
+from lib.supabase import get_current_user, supabase
 from models.alert import AlertCreate, AlertUpdate
 
 router = APIRouter()
+
+# Use the service-role supabase client throughout — avoids RLS policy requirements.
+# user_id equality checks in every query enforce row-level ownership at the app layer.
 
 
 @router.get("")
 def get_alerts(current_user: dict = Depends(get_current_user)):
     try:
-        db = get_user_client(current_user["token"])
-        res = db.table("alerts").select("*").eq("user_id", current_user["user_id"]).order("created_at", desc=True).execute()
+        res = supabase.table("alerts").select("*").eq("user_id", current_user["user_id"]).order("created_at", desc=True).execute()
         return {"alerts": res.data or []}
     except Exception as e:
         raise HTTPException(status_code=500, detail=str(e))
@@ -18,13 +20,12 @@ def get_alerts(current_user: dict = Depends(get_current_user)):
 @router.post("")
 def create_alert(body: AlertCreate, current_user: dict = Depends(get_current_user)):
     try:
-        db = get_user_client(current_user["token"])
-        res = db.table("alerts").insert({
-            "user_id": current_user["user_id"],
-            "name": body.name,
-            "filters": body.filters.model_dump(),
+        res = supabase.table("alerts").insert({
+            "user_id":   current_user["user_id"],
+            "name":      body.name,
+            "filters":   body.filters.model_dump(),
             "frequency": body.frequency,
-            "active": True,
+            "active":    True,
         }).execute()
         return {"alert_id": res.data[0]["id"], "message": "Alert created"}
     except Exception as e:
@@ -32,14 +33,9 @@ def create_alert(body: AlertCreate, current_user: dict = Depends(get_current_use
 
 
 @router.put("/{alert_id}")
-def update_alert(
-    alert_id: str,
-    body: AlertUpdate,
-    current_user: dict = Depends(get_current_user),
-):
+def update_alert(alert_id: str, body: AlertUpdate, current_user: dict = Depends(get_current_user)):
     try:
-        db = get_user_client(current_user["token"])
-        existing = db.table("alerts").select("id").eq("id", alert_id).eq("user_id", current_user["user_id"]).execute()
+        existing = supabase.table("alerts").select("id").eq("id", alert_id).eq("user_id", current_user["user_id"]).execute()
         if not existing.data:
             raise HTTPException(status_code=404, detail="Alert not found")
 
@@ -47,7 +43,7 @@ def update_alert(
         if "filters" in updates and updates["filters"]:
             updates["filters"] = body.filters.model_dump()
 
-        db.table("alerts").update(updates).eq("id", alert_id).execute()
+        supabase.table("alerts").update(updates).eq("id", alert_id).eq("user_id", current_user["user_id"]).execute()
         return {"message": "Alert updated"}
     except HTTPException:
         raise
@@ -58,12 +54,11 @@ def update_alert(
 @router.delete("/{alert_id}")
 def delete_alert(alert_id: str, current_user: dict = Depends(get_current_user)):
     try:
-        db = get_user_client(current_user["token"])
-        existing = db.table("alerts").select("id").eq("id", alert_id).eq("user_id", current_user["user_id"]).execute()
+        existing = supabase.table("alerts").select("id").eq("id", alert_id).eq("user_id", current_user["user_id"]).execute()
         if not existing.data:
             raise HTTPException(status_code=404, detail="Alert not found")
-        db.table("alerts").delete().eq("id", alert_id).execute()
-        return {"message": "Alert deleted"}
+        supabase.table("alerts").delete().eq("id", alert_id).eq("user_id", current_user["user_id"]).execute()
+        return {"message": "Deleted"}
     except HTTPException:
         raise
     except Exception as e:
@@ -73,12 +68,10 @@ def delete_alert(alert_id: str, current_user: dict = Depends(get_current_user)):
 @router.get("/{alert_id}/history")
 def get_alert_history(alert_id: str, current_user: dict = Depends(get_current_user)):
     try:
-        db = get_user_client(current_user["token"])
-        alert = db.table("alerts").select("id").eq("id", alert_id).eq("user_id", current_user["user_id"]).execute()
+        alert = supabase.table("alerts").select("id").eq("id", alert_id).eq("user_id", current_user["user_id"]).execute()
         if not alert.data:
             raise HTTPException(status_code=404, detail="Alert not found")
-
-        res = db.table("alert_history").select("*").eq("alert_id", alert_id).order("sent_at", desc=True).limit(20).execute()
+        res = supabase.table("alert_history").select("*").eq("alert_id", alert_id).order("sent_at", desc=True).limit(20).execute()
         return {"history": res.data or []}
     except HTTPException:
         raise

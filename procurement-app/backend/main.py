@@ -79,13 +79,39 @@ async def trigger_alerts_now():
 
 @app.get("/debug")
 def debug():
+    import base64, json as _json
     import lib.ocds_fetcher as fetcher
+    from lib.supabase import supabase as _sb
+
     cache = fetcher.load_cache()
+
+    # Decode the JWT role claim from SUPABASE_KEY to check anon vs service_role
+    key = os.getenv("SUPABASE_KEY", "")
+    key_role = "unknown"
+    try:
+        payload = key.split(".")[1]
+        payload += "=" * (-len(payload) % 4)
+        key_role = _json.loads(base64.urlsafe_b64decode(payload)).get("role", "unknown")
+    except Exception:
+        key_role = "parse_error"
+
+    # Test whether the supabase client can actually read saved_contracts
+    db_read_ok = False
+    db_read_error = ""
+    try:
+        _sb.table("saved_contracts").select("id").limit(1).execute()
+        db_read_ok = True
+    except Exception as e:
+        db_read_error = str(e)
+
     return {
         "status": "ok",
         "allowed_origins": os.getenv("ALLOWED_ORIGINS", "*"),
         "supabase_url_set": bool(os.getenv("SUPABASE_URL")),
-        "supabase_key_set": bool(os.getenv("SUPABASE_KEY")),
+        "supabase_key_set": bool(key),
+        "supabase_key_role": key_role,   # should be "service_role" not "anon"
+        "supabase_db_read_ok": db_read_ok,
+        "supabase_db_read_error": db_read_error,
         "analytics_cache_records": cache.get("record_count", 0),
         "analytics_cache_source": cache.get("source", "none"),
     }

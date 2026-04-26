@@ -87,12 +87,12 @@ def save_contract(
         res = supabase.table("saved_contracts").insert({
             "user_id":  current_user["user_id"],
             "ocid":     ocid,
-            "title":    body.get("title", ""),
-            "buyer":    body.get("buyer", ""),
-            "region":   body.get("region", ""),
-            "value":    body.get("value"),
-            "deadline": body.get("deadline", ""),
-            "notes":    body.get("notes", ""),
+            "title":    body.get("title") or "",
+            "buyer":    body.get("buyer") or "",
+            "region":   body.get("region") or "",
+            "value":    body.get("value") or None,
+            "deadline": body.get("deadline") or "",
+            "notes":    body.get("notes") or "",
         }).execute()
         return {"message": "Saved", "id": res.data[0]["id"]}
     except Exception as e:
