@@ -302,18 +302,37 @@ def _compute_stats(contracts: List[dict]) -> Dict[str, Any]:
 
     now = datetime.utcnow()
     three_months_ago = now - timedelta(days=90)
+    week_ahead = now + timedelta(days=7)
+    month_ahead = now + timedelta(days=30)
+    now_str = now.strftime("%Y-%m-%d")
 
-    week_contracts = [
+    recent_published = [
         c for c in contracts
         if c.get("published") and c["published"][:10] >= three_months_ago.strftime("%Y-%m-%d")
     ]
 
     values = [c["value"] for c in contracts if c.get("value")]
-    sme_contracts = [c for c in contracts if c.get("sme_suitable") is True]
+    sme_count  = sum(1 for c in contracts if c.get("sme_suitable") is True)
+    large_count = sum(1 for c in contracts if c.get("sme_suitable") is False)
+    unknown_count = len(contracts) - sme_count - large_count
 
-    sme_rate = (len(sme_contracts) / len(contracts) * 100) if contracts else 0
+    sme_rate  = (sme_count / len(contracts) * 100) if contracts else 0
     avg_value = sum(values) / len(values) if values else 0
     total_spend = sum(values)
+
+    unique_buyers = len(set(c.get("buyer", "") for c in contracts if c.get("buyer")))
+
+    # Deadline urgency
+    expiring_week = expiring_month = 0
+    for c in contracts:
+        dl = c.get("deadline")
+        if dl and len(dl) >= 10:
+            d = dl[:10]
+            if d >= now_str:
+                if d <= week_ahead.strftime("%Y-%m-%d"):
+                    expiring_week += 1
+                elif d <= month_ahead.strftime("%Y-%m-%d"):
+                    expiring_month += 1
 
     region_sme: Dict[str, Dict] = {}
     for c in contracts:
@@ -324,17 +343,18 @@ def _compute_stats(contracts: List[dict]) -> Dict[str, Any]:
         if c.get("sme_suitable"):
             region_sme[r]["sme"] += 1
 
-    sme_by_region = [
-        {"region": r, "sme_rate": (v["sme"] / v["total"] * 100) if v["total"] else 0}
-        for r, v in region_sme.items()
-    ]
+    sme_by_region = sorted(
+        [{"region": r, "sme_rate": round(v["sme"] / v["total"] * 100, 1) if v["total"] else 0}
+         for r, v in region_sme.items()],
+        key=lambda x: x["sme_rate"], reverse=True
+    )[:12]
 
     value_bands = [
-        {"band": "< £10k", "count": sum(1 for v in values if v < 10_000)},
-        {"band": "£10k–100k", "count": sum(1 for v in values if 10_000 <= v < 100_000)},
+        {"band": "< £10k",     "count": sum(1 for v in values if v < 10_000)},
+        {"band": "£10k–100k",  "count": sum(1 for v in values if 10_000 <= v < 100_000)},
         {"band": "£100k–500k", "count": sum(1 for v in values if 100_000 <= v < 500_000)},
-        {"band": "£500k–1M", "count": sum(1 for v in values if 500_000 <= v < 1_000_000)},
-        {"band": "> £1M", "count": sum(1 for v in values if v >= 1_000_000)},
+        {"band": "£500k–1M",   "count": sum(1 for v in values if 500_000 <= v < 1_000_000)},
+        {"band": "> £1M",      "count": sum(1 for v in values if v >= 1_000_000)},
     ]
 
     sector_counts: Dict[str, int] = {}
@@ -344,17 +364,43 @@ def _compute_stats(contracts: List[dict]) -> Dict[str, Any]:
                 sector_counts[desc] = sector_counts.get(desc, 0) + 1
     top_sectors = sorted(sector_counts.items(), key=lambda x: x[1], reverse=True)[:10]
 
+    # Top 5 most recent contracts for the dashboard feed
+    recent_slim = [
+        {
+            "ocid":         c["ocid"],
+            "title":        (c["title"] or "")[:80],
+            "buyer":        c.get("buyer", ""),
+            "value":        c.get("value"),
+            "published":    c.get("published", ""),
+            "deadline":     c.get("deadline"),
+            "sme_suitable": c.get("sme_suitable"),
+            "url":          c.get("url", ""),
+        }
+        for c in sorted(
+            [x for x in contracts if x.get("published")],
+            key=lambda x: x["published"], reverse=True
+        )[:5]
+    ]
+
     return {
         "kpis": {
-            "week_count": len(week_contracts),
-            "sme_rate": round(sme_rate, 1),
-            "avg_value": round(avg_value, 2),
-            "total_spend": round(total_spend, 2),
+            "week_count":    len(recent_published),
+            "sme_rate":      round(sme_rate, 1),
+            "avg_value":     round(avg_value, 2),
+            "total_spend":   round(total_spend, 2),
+            "sme_count":     sme_count,
+            "large_count":   large_count,
+            "unknown_count": unknown_count,
+            "unique_buyers": unique_buyers,
+            "expiring_week": expiring_week,
+            "expiring_month": expiring_month,
+            "total_fetched": len(contracts),
         },
         "charts": {
             "sme_by_region": sme_by_region,
             "sme_over_time": [],
-            "value_bands": value_bands,
-            "top_sectors": [{"sector": s, "count": c} for s, c in top_sectors],
+            "value_bands":   value_bands,
+            "top_sectors":   [{"sector": s, "count": c} for s, c in top_sectors],
         },
+        "recent_contracts": recent_slim,
     }
