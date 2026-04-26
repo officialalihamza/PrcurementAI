@@ -39,13 +39,21 @@
     </div>
 
     <!-- Tab Navigation -->
-    <div class="flex gap-1 mb-5 bg-gray-100 rounded-xl p-1 overflow-x-auto">
-      <button v-for="tab in tabs" :key="tab.id" @click="activeTab = tab.id"
-        class="flex items-center gap-1.5 px-4 py-2 rounded-lg text-sm font-medium whitespace-nowrap transition-all duration-150 flex-shrink-0"
-        :class="activeTab === tab.id ? 'bg-white text-brand-700 shadow-sm' : 'text-gray-500 hover:text-gray-800'">
-        {{ tab.label }}
-        <span v-if="tab.badge" class="px-1.5 py-0.5 text-xs rounded bg-brand-100 text-brand-600">{{ tab.badge }}</span>
-      </button>
+    <div class="mb-5">
+      <div class="flex gap-0 border-b border-gray-200 overflow-x-auto">
+        <button v-for="tab in tabs" :key="tab.id" @click="activeTab = tab.id"
+          class="flex items-center gap-1.5 px-5 py-3 text-sm font-medium whitespace-nowrap transition-all duration-150 flex-shrink-0 border-b-2 -mb-px"
+          :class="activeTab === tab.id
+            ? 'border-brand-600 text-brand-700 bg-brand-50/50'
+            : 'border-transparent text-gray-500 hover:text-gray-800 hover:border-gray-300'">
+          {{ tab.label }}
+          <span v-if="tab.badge"
+            class="px-1.5 py-0.5 text-[10px] rounded font-semibold"
+            :class="activeTab === tab.id ? 'bg-brand-600 text-white' : 'bg-gray-200 text-gray-600'">
+            {{ tab.badge }}
+          </span>
+        </button>
+      </div>
     </div>
 
     <!-- ═══════════════════════════════════════════════════════════ -->
@@ -507,7 +515,7 @@
 </template>
 
 <script setup>
-import { ref, computed, reactive, onMounted, onUnmounted, watch } from 'vue'
+import { ref, computed, reactive, onMounted, onUnmounted, watch, nextTick } from 'vue'
 import { analyticsApi } from '@/lib/api'
 
 // ── Tabs ───────────────────────────────────────────────────────────────────
@@ -726,9 +734,14 @@ watch(stats, async (v) => {
 }, { flush: 'post' })
 
 // ── Dissertation charts — render when tab becomes active ─────────────────
+// v-show keeps DOM in tree but display:none — Plotly needs visible container.
+// nextTick flushes Vue's DOM update (sets display:block), then we wait one
+// rAF tick so the browser has painted the layout before Plotly measures.
 watch(activeTab, async (tab) => {
   if (!Plotly) { try { Plotly = (await import('plotly.js-dist-min')).default } catch { return } }
-  await new Promise(r => setTimeout(r, 30)) // wait for v-show DOM
+  await nextTick()
+  await new Promise(r => requestAnimationFrame(r))
+  await new Promise(r => requestAnimationFrame(r)) // two rAFs for safety
   if (tab === 'regression')  renderRegression()
   if (tab === 'clustering')  renderClustering()
   if (tab === 'model')       renderModel()
