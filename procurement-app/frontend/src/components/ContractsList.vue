@@ -6,12 +6,13 @@
         <thead>
           <tr class="border-b border-gray-200 bg-gray-50">
             <th class="text-left px-4 py-3 font-medium text-gray-600">Contract</th>
-            <th class="text-left px-4 py-3 font-medium text-gray-600">Buyer / Region</th>
+            <th class="text-left px-4 py-3 font-medium text-gray-600 hidden md:table-cell">Buyer / Region</th>
+            <th class="text-left px-4 py-3 font-medium text-gray-600 hidden lg:table-cell">CPV / Sector</th>
             <th class="text-right px-4 py-3 font-medium text-gray-600">Value</th>
-            <th class="text-left px-4 py-3 font-medium text-gray-600">Deadline</th>
-            <th class="text-center px-4 py-3 font-medium text-gray-600">SME</th>
-            <th class="text-center px-4 py-3 font-medium text-gray-600">Docs</th>
-            <th class="text-center px-4 py-3 font-medium text-gray-600">Match</th>
+            <th class="text-left px-4 py-3 font-medium text-gray-600 hidden sm:table-cell">Deadline</th>
+            <th class="text-center px-4 py-3 font-medium text-gray-600">Status</th>
+            <th class="text-center px-4 py-3 font-medium text-gray-600 hidden lg:table-cell">SME</th>
+            <th class="text-center px-4 py-3 font-medium text-gray-600 hidden xl:table-cell">Match</th>
             <th class="px-4 py-3"></th>
           </tr>
         </thead>
@@ -22,47 +23,75 @@
             class="border-b border-gray-100 hover:bg-gray-50 cursor-pointer transition-colors"
             @click="openDetail(contract)"
           >
+            <!-- Contract title + doc count badge -->
             <td class="px-4 py-3 max-w-xs">
-              <p class="font-medium text-gray-900 line-clamp-2">{{ contract.title }}</p>
-              <p v-if="contract.cpv_descriptions?.length" class="text-xs text-gray-500 mt-0.5">
-                {{ contract.cpv_descriptions[0] }}
-              </p>
+              <div class="flex items-start gap-2">
+                <div class="min-w-0">
+                  <p class="font-medium text-gray-900 line-clamp-2 text-sm">{{ contract.title }}</p>
+                  <div class="flex items-center gap-2 mt-0.5">
+                    <p class="text-xs text-gray-400 hidden md:block">{{ contract.buyer }}</p>
+                    <span v-if="contract.documents?.length"
+                      class="inline-flex items-center gap-0.5 px-1.5 py-0.5 rounded text-xs font-medium bg-blue-50 text-blue-600 flex-shrink-0">
+                      <svg class="w-3 h-3" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+                        <path stroke-linecap="round" stroke-linejoin="round" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"/>
+                      </svg>
+                      {{ contract.documents.length }}
+                    </span>
+                  </div>
+                </div>
+              </div>
             </td>
-            <td class="px-4 py-3 text-gray-600 whitespace-nowrap">
-              <p class="text-sm">{{ contract.buyer }}</p>
-              <p class="text-xs text-gray-500">{{ contract.region }}</p>
+
+            <!-- Buyer / Region -->
+            <td class="px-4 py-3 text-gray-600 hidden md:table-cell">
+              <p class="text-sm font-medium text-gray-700 line-clamp-1">{{ contract.buyer }}</p>
+              <p class="text-xs text-gray-400">{{ contract.region }}</p>
             </td>
+
+            <!-- CPV Code -->
+            <td class="px-4 py-3 hidden lg:table-cell">
+              <template v-if="contract.cpv_codes?.length">
+                <p class="text-xs font-mono text-gray-600 bg-gray-50 px-1.5 py-0.5 rounded inline-block">{{ contract.cpv_codes[0] }}</p>
+                <p class="text-xs text-gray-400 mt-0.5 line-clamp-1">{{ contract.cpv_descriptions?.[0] || '' }}</p>
+              </template>
+              <span v-else class="text-gray-300 text-xs">—</span>
+            </td>
+
+            <!-- Value -->
             <td class="px-4 py-3 text-right font-medium text-gray-900 whitespace-nowrap">
               {{ formatValue(contract.value) }}
             </td>
-            <td class="px-4 py-3 text-gray-600 whitespace-nowrap">
+
+            <!-- Deadline -->
+            <td class="px-4 py-3 text-gray-600 whitespace-nowrap hidden sm:table-cell">
               <span :class="deadlineClass(contract.deadline)">
                 {{ formatDate(contract.deadline) }}
               </span>
             </td>
+
+            <!-- Status -->
             <td class="px-4 py-3 text-center">
+              <span v-if="contract.status" class="inline-block px-2 py-0.5 rounded-full text-xs font-medium whitespace-nowrap"
+                :class="statusBadge(contract.status).cls">
+                {{ statusBadge(contract.status).label }}
+              </span>
+              <span v-else class="text-gray-300 text-xs">—</span>
+            </td>
+
+            <!-- SME -->
+            <td class="px-4 py-3 text-center hidden lg:table-cell">
               <span v-if="contract.sme_suitable === true" class="badge-sme">SME</span>
               <span v-else-if="contract.sme_suitable === false" class="badge-large">Large</span>
               <span v-else class="text-gray-300 text-xs" title="SME suitability not specified in this notice">—</span>
             </td>
-            <td class="px-4 py-3 text-center">
-              <span v-if="contract.documents?.length"
-                class="inline-flex items-center gap-0.5 px-1.5 py-0.5 rounded text-xs font-medium bg-blue-50 text-blue-700">
-                <svg class="w-3 h-3" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
-                  <path stroke-linecap="round" stroke-linejoin="round" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"/>
-                </svg>
-                {{ contract.documents.length }}
-              </span>
-              <span v-else class="text-gray-400 text-xs">—</span>
-            </td>
-            <td class="px-4 py-3 text-center">
+
+            <!-- Match score -->
+            <td class="px-4 py-3 text-center hidden xl:table-cell">
               <div v-if="contract.match_score > 0" class="flex items-center justify-center gap-1">
-                <div class="w-16 h-2 rounded-full bg-gray-200 overflow-hidden">
-                  <div
-                    class="h-full rounded-full transition-all"
+                <div class="w-14 h-2 rounded-full bg-gray-200 overflow-hidden">
+                  <div class="h-full rounded-full transition-all"
                     :class="scoreColor(contract.match_score)"
-                    :style="{ width: contract.match_score + '%' }"
-                  />
+                    :style="{ width: contract.match_score + '%' }" />
                 </div>
                 <span class="text-xs font-medium" :class="scoreTextColor(contract.match_score)">
                   {{ contract.match_score }}
@@ -70,12 +99,12 @@
               </div>
               <span v-else class="text-gray-300 text-xs" title="Complete your company profile with SIC codes to see match scores">—</span>
             </td>
+
+            <!-- Save bookmark -->
             <td class="px-4 py-3" @click.stop>
-              <button
-                @click="toggleSave(contract)"
+              <button @click="toggleSave(contract)"
                 class="p-1.5 rounded-lg hover:bg-gray-100 transition-colors"
-                :title="savedOcids.has(contract.ocid) ? 'Unsave' : 'Save'"
-              >
+                :title="savedOcids.has(contract.ocid) ? 'Unsave' : 'Save'">
                 <svg class="w-4 h-4" :class="savedOcids.has(contract.ocid) ? 'text-brand-600 fill-brand-600' : 'text-gray-400'" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
                   <path stroke-linecap="round" stroke-linejoin="round" d="M5 5a2 2 0 012-2h10a2 2 0 012 2v16l-7-3.5L5 21V5z" />
                 </svg>
@@ -245,6 +274,20 @@ async function toggleSave(contract) {
   } else {
     await contractsStore.saveContract(contract)
   }
+}
+
+function statusBadge(status) {
+  const s = (status || '').toLowerCase()
+  if (s === 'active')                          return { label: 'Active',       cls: 'bg-green-100 text-green-700' }
+  if (s === 'tender')                          return { label: 'Open',         cls: 'bg-emerald-100 text-emerald-700' }
+  if (s === 'complete')                        return { label: 'Complete',     cls: 'bg-blue-100 text-blue-700' }
+  if (s === 'award' || s === 'contractsigned') return { label: 'Awarded',      cls: 'bg-blue-100 text-blue-700' }
+  if (s.includes('cancel'))                    return { label: 'Cancelled',    cls: 'bg-red-100 text-red-700' }
+  if (s === 'unsuccessful')                    return { label: 'Unsuccessful', cls: 'bg-red-100 text-red-700' }
+  if (s === 'withdrawn')                       return { label: 'Withdrawn',    cls: 'bg-amber-100 text-amber-700' }
+  if (s === 'planning')                        return { label: 'Planning',     cls: 'bg-purple-100 text-purple-700' }
+  const label = status ? status.charAt(0).toUpperCase() + status.slice(1) : '—'
+  return { label, cls: 'bg-gray-100 text-gray-600' }
 }
 
 function formatValue(val) {

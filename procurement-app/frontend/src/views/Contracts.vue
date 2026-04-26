@@ -49,8 +49,8 @@
         <button @click="resetFilters" class="btn-secondary px-4 text-sm whitespace-nowrap">Reset</button>
       </div>
 
-      <!-- Row 2: filters grid -->
-      <div class="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-6 gap-3">
+      <!-- Row 2: filters grid (8 cols on xl, 4 on lg, 2 on sm) -->
+      <div class="grid grid-cols-2 sm:grid-cols-4 xl:grid-cols-8 gap-3">
         <div>
           <label class="label text-xs">Region</label>
           <select v-model="filters.region" class="input text-sm py-1.5">
@@ -60,10 +60,31 @@
         </div>
 
         <div>
+          <label class="label text-xs">Status</label>
+          <select v-model="filters.status_filter" class="input text-sm py-1.5">
+            <option value="all">All statuses</option>
+            <option value="active">Open / Active</option>
+            <option value="complete">Awarded / Complete</option>
+            <option value="cancelled">Cancelled</option>
+          </select>
+        </div>
+
+        <div>
           <label class="label text-xs">SME suitability</label>
           <select v-model="filters.sme_flag" class="input text-sm py-1.5">
             <option v-for="opt in smeOptions" :key="opt.value" :value="opt.value">{{ opt.label }}</option>
           </select>
+        </div>
+
+        <div>
+          <label class="label text-xs">CPV code</label>
+          <input
+            v-model="filters.cpv_code"
+            type="text"
+            class="input text-sm py-1.5"
+            placeholder="e.g. 72 or 72100000"
+            @keyup.enter="doSearch"
+          />
         </div>
 
         <div>
@@ -185,19 +206,27 @@ const smeOptions = [
 ]
 
 const filters = reactive({
-  keyword:   '',
-  region:    '',
-  value_min: 0,
-  value_max: 10000000,
-  sme_flag:  'all',
-  sort:      'newest',
-  date_from: '',
-  date_to:   '',
+  keyword:       '',
+  region:        '',
+  value_min:     0,
+  value_max:     10000000,
+  sme_flag:      'all',
+  status_filter: 'all',
+  cpv_code:      '',
+  sort:          'newest',
+  date_from:     '',
+  date_to:       '',
 })
 
 async function doSearch() {
   currentPage.value = 1
-  store.setFilters({ ...filters, regions: filters.region ? [filters.region] : [], page: 1 })
+  store.setFilters({
+    ...filters,
+    regions:       filters.region   ? [filters.region]   : [],
+    cpv:           filters.cpv_code ? [filters.cpv_code] : [],
+    status_filter: filters.status_filter,
+    page: 1,
+  })
   await store.search()
   await store.fetchSaved()
 }
@@ -205,7 +234,8 @@ async function doSearch() {
 function resetFilters() {
   Object.assign(filters, {
     keyword: '', region: '', value_min: 0, value_max: 10000000,
-    sme_flag: 'all', sort: 'newest', date_from: '', date_to: '',
+    sme_flag: 'all', status_filter: 'all', cpv_code: '',
+    sort: 'newest', date_from: '', date_to: '',
   })
   doSearch()
 }

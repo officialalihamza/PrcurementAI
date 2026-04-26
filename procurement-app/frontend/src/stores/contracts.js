@@ -15,6 +15,7 @@ export const useContractsStore = defineStore('contracts', () => {
     value_min: 0,
     value_max: 10000000,
     sme_flag: 'all',
+    status_filter: 'all',
     sort: 'newest',
     page: 1,
   })
@@ -67,6 +68,7 @@ export const useContractsStore = defineStore('contracts', () => {
       value_min: 0,
       value_max: 10000000,
       sme_flag: 'all',
+      status_filter: 'all',
       sort: 'newest',
       page: 1,
     }

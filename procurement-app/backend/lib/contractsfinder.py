@@ -194,6 +194,7 @@ def search(
     value_max: float = 10_000_000,
     keyword: Optional[str] = None,
     sme_flag: Optional[str] = None,
+    status_filter: Optional[str] = None,
     date_from: Optional[str] = None,
     date_to: Optional[str] = None,
     sort: str = "newest",
@@ -206,6 +207,7 @@ def search(
         "cpv": sorted(cpv), "regions": sorted(regions),
         "value_min": value_min, "value_max": value_max,
         "keyword": keyword, "sme_flag": sme_flag,
+        "status_filter": status_filter,
         "date_from": date_from, "date_to": date_to,
         "sort": sort, "page": page,
     }
@@ -256,6 +258,14 @@ def search(
                 continue
             if sme_flag == "large" and parsed["sme_suitable"] is True:
                 continue
+            if status_filter and status_filter != "all":
+                s = (parsed.get("status") or "").lower()
+                if status_filter == "active" and not (s in ("active", "tender") or "tender" in s):
+                    continue
+                if status_filter == "complete" and not (s in ("complete",) or "award" in s):
+                    continue
+                if status_filter == "cancelled" and not (s in ("cancelled", "unsuccessful", "withdrawn")):
+                    continue
             contracts.append(parsed)
 
     if sort == "value":
