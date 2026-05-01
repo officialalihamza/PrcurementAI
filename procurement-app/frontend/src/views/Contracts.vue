@@ -5,7 +5,7 @@
     <div class="mb-4 flex items-center justify-between gap-4">
       <div>
         <h1 class="text-2xl font-bold text-gray-900">Contract Search</h1>
-        <p class="text-gray-500 text-sm mt-0.5">Live data from UK Contracts Finder</p>
+        <p class="text-gray-500 text-sm mt-0.5">Live data from UK Contracts Finder, Find a Tender &amp; Spend Data</p>
       </div>
       <div class="flex items-center gap-3">
         <p class="text-sm text-gray-500 hidden sm:block">
@@ -63,7 +63,7 @@
       </div>
 
       <!-- Row 3: Primary filters -->
-      <div class="grid grid-cols-2 sm:grid-cols-4 gap-3">
+      <div class="grid grid-cols-2 sm:grid-cols-5 gap-3">
         <div>
           <label class="label text-xs">Location / City</label>
           <input
@@ -73,6 +73,12 @@
             placeholder="e.g. London, Manchester…"
             @keyup.enter="doSearch"
           />
+        </div>
+        <div>
+          <label class="label text-xs">Data Source</label>
+          <select v-model="filters.source" class="input text-sm py-1.5">
+            <option v-for="opt in sourceOptions" :key="opt.value" :value="opt.value">{{ opt.label }}</option>
+          </select>
         </div>
         <div>
           <label class="label text-xs">SME suitability</label>
@@ -218,6 +224,13 @@ const smeOptions = [
   { value: 'large', label: 'Large only' },
 ]
 
+const sourceOptions = [
+  { value: 'all',                  label: 'All Sources' },
+  { value: 'contracts-finder',     label: 'Contracts Finder' },
+  { value: 'find-a-tender',        label: 'Find a Tender' },
+  { value: 'spend-data',           label: 'Spend Data' },
+]
+
 const filters = reactive({
   keyword:       '',
   region:        '',
@@ -229,6 +242,7 @@ const filters = reactive({
   sort:          'newest',
   date_from:     '',
   date_to:       '',
+  source:        'all',
 })
 
 // Count how many "more filters" are actively set (for the badge)
@@ -254,6 +268,7 @@ async function doSearch() {
     sort:          filters.sort,
     date_from:     filters.date_from,
     date_to:       filters.date_to,
+    source:        filters.source,
     page: 1,
   })
   await store.search()
@@ -264,7 +279,7 @@ function resetFilters() {
   Object.assign(filters, {
     keyword: '', region: '', value_min: 0, value_max: 10000000,
     sme_flag: 'all', status_filter: 'active', cpv_code: '',
-    sort: 'newest', date_from: '', date_to: '',
+    sort: 'newest', date_from: '', date_to: '', source: 'all',
   })
   showMore.value = false
   doSearch()

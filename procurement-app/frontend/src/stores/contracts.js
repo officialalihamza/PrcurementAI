@@ -11,6 +11,7 @@ const DEFAULT_FILTERS = {
   sme_flag: 'all',
   status_filter: 'active',
   sort: 'newest',
+  source: 'all',
   page: 1,
 }
 

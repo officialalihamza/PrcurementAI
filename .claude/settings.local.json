@@ -1,7 +1,10 @@
 {
   "permissions": {
     "allow": [
-      "Bash(python -c ' *)"
+      "Bash(python -c ' *)",
+      "Read(//d/University/FYP/**)",
+      "Read(//d/University/FYP/Extracted Data/**)",
+      "Bash(python code/analysis/regression_analysis.py)"
     ]
   }
 }

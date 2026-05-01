@@ -27,6 +27,12 @@
             <td class="px-4 py-3 max-w-xs">
               <div class="flex items-start gap-2">
                 <div class="min-w-0">
+                  <div class="flex items-center gap-1.5 mb-0.5">
+                    <span :class="sourceBadge(contract.source).cls"
+                      class="inline-block px-1.5 py-0.5 rounded text-[10px] font-semibold tracking-wide uppercase flex-shrink-0">
+                      {{ sourceBadge(contract.source).label }}
+                    </span>
+                  </div>
                   <p class="font-medium text-gray-900 line-clamp-2 text-sm">{{ contract.title }}</p>
                   <div class="flex items-center gap-2 mt-0.5">
                     <p class="text-xs text-gray-400 hidden md:block">{{ contract.buyer }}</p>
@@ -236,7 +242,7 @@
                 rel="noopener"
                 class="btn-primary flex-1 text-center"
               >
-                View on Contracts Finder ↗
+                View on {{ sourceBadge(selected.source).site }} ↗
               </a>
               <button @click="toggleSave(selected)" class="btn-secondary">
                 {{ savedOcids.has(selected.ocid) ? 'Unsave' : 'Save contract' }}
@@ -274,6 +280,12 @@ async function toggleSave(contract) {
   } else {
     await contractsStore.saveContract(contract)
   }
+}
+
+function sourceBadge(source) {
+  if (source === 'find-a-tender')    return { label: 'FaT',   cls: 'bg-purple-100 text-purple-700', site: 'Find a Tender' }
+  if (source === 'spend-data')       return { label: 'Spend', cls: 'bg-amber-100  text-amber-700',  site: 'data.gov.uk' }
+  return                                    { label: 'CF',    cls: 'bg-teal-100   text-teal-700',   site: 'Contracts Finder' }
 }
 
 function statusBadge(status) {
