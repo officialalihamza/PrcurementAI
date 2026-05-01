@@ -9,6 +9,7 @@ const routes = [
   { path: '/dashboard', name: 'Dashboard', component: () => import('@/views/Dashboard.vue'), meta: { requiresAuth: true } },
   { path: '/contracts', name: 'Contracts', component: () => import('@/views/Contracts.vue'), meta: { requiresAuth: true } },
   { path: '/analytics', name: 'Analytics', component: () => import('@/views/Analytics.vue'), meta: { requiresAuth: true } },
+  { path: '/analytics/stats', name: 'StatisticalAnalysis', component: () => import('@/views/analytics/StatisticalAnalysis.vue'), meta: { requiresAuth: true } },
   { path: '/settings', name: 'Settings', component: () => import('@/views/Settings.vue'), meta: { requiresAuth: true } },
   { path: '/:pathMatch(.*)*', redirect: '/' },
 ]

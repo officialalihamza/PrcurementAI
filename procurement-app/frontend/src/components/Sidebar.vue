@@ -57,17 +57,40 @@
         Contracts
       </RouterLink>
 
-      <!-- Analytics -->
-      <RouterLink to="/analytics" @click="mobileOpen = false"
-        class="flex items-center gap-3 px-3 py-2.5 rounded-lg text-sm font-medium transition-all duration-150 group"
-        :class="isActive('/analytics') ? 'bg-brand-600/20 text-brand-300 border border-brand-600/30' : 'text-slate-400 hover:text-white hover:bg-slate-800'">
-        <svg class="w-5 h-5 flex-shrink-0" :class="isActive('/analytics') ? 'text-brand-400' : 'text-slate-500 group-hover:text-slate-300'"
-          fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
-          <path stroke-linecap="round" stroke-linejoin="round"
-            d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z"/>
-        </svg>
-        Analytics
-      </RouterLink>
+      <!-- Analytics expandable group -->
+      <div>
+        <button @click="analyticsOpen = !analyticsOpen"
+          class="w-full flex items-center justify-between gap-3 px-3 py-2.5 rounded-lg text-sm font-medium transition-all duration-150 group"
+          :class="isActive('/analytics') ? 'bg-brand-600/20 text-brand-300 border border-brand-600/30' : 'text-slate-400 hover:text-white hover:bg-slate-800'">
+          <div class="flex items-center gap-3">
+            <svg class="w-5 h-5 flex-shrink-0" :class="isActive('/analytics') ? 'text-brand-400' : 'text-slate-500 group-hover:text-slate-300'"
+              fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+              <path stroke-linecap="round" stroke-linejoin="round"
+                d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z"/>
+            </svg>
+            Analytics
+          </div>
+          <svg class="w-3.5 h-3.5 text-slate-500 transition-transform duration-200 flex-shrink-0"
+            :class="analyticsOpen ? 'rotate-180' : ''"
+            fill="none" viewBox="0 0 24 24" stroke="currentColor">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M19 9l-7 7-7-7"/>
+          </svg>
+        </button>
+
+        <!-- Sub-nav -->
+        <div v-if="analyticsOpen" class="mt-0.5 ml-4 pl-3 border-l border-slate-700/50 space-y-0.5">
+          <RouterLink to="/analytics" @click="mobileOpen = false"
+            class="flex items-center gap-2 px-2 py-2 rounded-md text-xs font-medium transition-all"
+            :class="route.path === '/analytics' ? 'text-brand-300 bg-brand-600/10' : 'text-slate-400 hover:text-white hover:bg-slate-800'">
+            <span class="text-[10px]">📊</span> Market Overview
+          </RouterLink>
+          <RouterLink to="/analytics/stats" @click="mobileOpen = false"
+            class="flex items-center gap-2 px-2 py-2 rounded-md text-xs font-medium transition-all"
+            :class="route.path === '/analytics/stats' ? 'text-brand-300 bg-brand-600/10' : 'text-slate-400 hover:text-white hover:bg-slate-800'">
+            <span class="text-[10px]">🔬</span> Statistical Analysis
+          </RouterLink>
+        </div>
+      </div>
 
       <!-- Section label -->
       <div class="pt-4 pb-1">
@@ -116,8 +139,9 @@ const route     = useRoute()
 const router    = useRouter()
 const userStore = useUserStore()
 
-const mobileOpen = ref(false)
-const userEmail  = computed(() => userStore.userEmail)
+const mobileOpen    = ref(false)
+const analyticsOpen = ref(route.path.startsWith('/analytics'))
+const userEmail     = computed(() => userStore.userEmail)
 
 function isActive(path) {
   return route.path === path || route.path.startsWith(path + '/')

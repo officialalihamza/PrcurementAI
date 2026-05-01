@@ -68,6 +68,16 @@ export const analyticsApi = {
   refresh:   (years)  => api.post('/analytics/refresh', null, { params: years ? { years } : {}, timeout: 10000 }),
 }
 
+// Statistical Analysis
+export const statsApi = {
+  hypothesisTests:        () => api.get('/stats/hypothesis-tests'),
+  sectorModels:           () => api.get('/stats/sector-models'),
+  regionalCompetitiveness:() => api.get('/stats/regional-competitiveness'),
+  anomalies:              () => api.get('/stats/anomalies'),
+  summary:                () => api.get('/stats/summary'),
+  invalidateCache:        () => api.post('/stats/invalidate-cache'),
+}
+
 // Alerts
 export const alertsApi = {
   list: () => api.get('/alerts'),
