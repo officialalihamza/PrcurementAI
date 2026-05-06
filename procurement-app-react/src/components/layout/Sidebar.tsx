@@ -71,14 +71,14 @@ export function Sidebar({ mobileOpen, onClose }: Props) {
             <ListItemIcon sx={{ minWidth: 36, color: 'inherit' }}>
               <DashboardOutlinedIcon fontSize="small" />
             </ListItemIcon>
-            <ListItemText primary={<Typography sx={{ fontSize: 13, fontWeight: isActive('/dashboard') ? 600 : 400 }}>Dashboard</Typography>} />
+            <ListItemText primary={<Typography sx={{ fontSize: 13, fontWeight: isActive('/dashboard') ? 600 : 400, color: 'inherit' }}>Dashboard</Typography>} />
           </ListItemButton>
 
           <ListItemButton onClick={() => nav('/contracts')} sx={itemSx(isActive('/contracts'))}>
             <ListItemIcon sx={{ minWidth: 36, color: 'inherit' }}>
               <SearchOutlinedIcon fontSize="small" />
             </ListItemIcon>
-            <ListItemText primary={<Typography sx={{ fontSize: 13, fontWeight: isActive('/contracts') ? 600 : 400 }}>Contracts</Typography>} />
+            <ListItemText primary={<Typography sx={{ fontSize: 13, fontWeight: isActive('/contracts') ? 600 : 400, color: 'inherit' }}>Contracts</Typography>} />
           </ListItemButton>
 
           {/* Analytics group */}
@@ -89,7 +89,7 @@ export function Sidebar({ mobileOpen, onClose }: Props) {
             <ListItemIcon sx={{ minWidth: 36, color: 'inherit' }}>
               <BarChartOutlinedIcon fontSize="small" />
             </ListItemIcon>
-            <ListItemText primary={<Typography sx={{ fontSize: 13, fontWeight: 500 }}>Analytics</Typography>} />
+            <ListItemText primary={<Typography sx={{ fontSize: 13, fontWeight: 500, color: 'inherit' }}>Analytics</Typography>} />
             {analyticsOpen ? <ExpandLessIcon fontSize="small" /> : <ExpandMoreIcon fontSize="small" />}
           </ListItemButton>
 
@@ -148,7 +148,7 @@ export function Sidebar({ mobileOpen, onClose }: Props) {
             <ListItemIcon sx={{ minWidth: 36, color: 'inherit' }}>
               <SettingsOutlinedIcon fontSize="small" />
             </ListItemIcon>
-            <ListItemText primary={<Typography sx={{ fontSize: 13, fontWeight: isActive('/settings') ? 600 : 400 }}>Alerts & Settings</Typography>} />
+            <ListItemText primary={<Typography sx={{ fontSize: 13, fontWeight: isActive('/settings') ? 600 : 400, color: 'inherit' }}>Alerts & Settings</Typography>} />
           </ListItemButton>
         </List>
       </Box>

@@ -1,3 +1,10 @@
+export interface ContractDocument {
+  url: string
+  type?: string
+  label?: string
+  title?: string
+}
+
 export interface Contract {
   id: string
   ocid: string
@@ -6,6 +13,7 @@ export interface Contract {
   supplier?: string
   value: number
   region: string
+  url?: string
   // snake_case matches actual API response
   cpv_code?: string
   cpvCode?: string       // alias kept for compat
@@ -16,7 +24,7 @@ export interface Contract {
   published?: string
   status?: string
   source?: string
-  documents?: number
+  documents?: ContractDocument[]
   description?: string
   authority_type?: string
 }

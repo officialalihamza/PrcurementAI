@@ -80,7 +80,6 @@ export function ContractsList({ contracts, total, loading }: Props) {
               <ColHead id="region" label="Region" />
               <ColHead id="deadline" label="Deadline" />
               <TableCell sx={{ whiteSpace: 'nowrap' }}>SME</TableCell>
-              <TableCell sx={{ whiteSpace: 'nowrap', display: { xs: 'none', lg: 'table-cell' } }}>Docs</TableCell>
               <TableCell sx={{ whiteSpace: 'nowrap', display: { xs: 'none', xl: 'table-cell' } }}>Source</TableCell>
             </TableRow>
           </TableHead>
@@ -102,9 +101,18 @@ export function ContractsList({ contracts, total, loading }: Props) {
                       textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
                       {c.title}
                     </Typography>
-                    {c.sector && (
-                      <Typography variant="caption" sx={{ color: '#6C757D', fontSize: 10 }}>{c.sector}</Typography>
-                    )}
+                    <Box sx={{ display: 'flex', alignItems: 'center', gap: 0.75, mt: 0.25 }}>
+                      {c.sector && (
+                        <Typography variant="caption" sx={{ color: '#6C757D', fontSize: 10 }}>{c.sector}</Typography>
+                      )}
+                      {c.documents && c.documents.length > 0 && (
+                        <Chip
+                          label={`${c.documents.length} doc${c.documents.length !== 1 ? 's' : ''}`}
+                          size="small"
+                          sx={{ fontSize: 9, height: 16, bgcolor: '#dbeafe', color: '#1d4ed8', fontWeight: 600, cursor: 'pointer' }}
+                        />
+                      )}
+                    </Box>
                   </TableCell>
 
                   {/* Buyer */}
@@ -145,14 +153,6 @@ export function ContractsList({ contracts, total, loading }: Props) {
                     {smeFlag === null && (
                       <Typography sx={{ fontSize: 10, color: '#9ca3af' }}>—</Typography>
                     )}
-                  </TableCell>
-
-                  {/* Documents */}
-                  <TableCell sx={{ display: { xs: 'none', lg: 'table-cell' } }}>
-                    {c.documents != null && c.documents > 0
-                      ? <Chip label={`${c.documents} docs`} size="small" sx={{ fontSize: 10, height: 18, bgcolor: '#e8edf3', color: '#1F3A5F' }} />
-                      : <Typography sx={{ fontSize: 10, color: '#9ca3af' }}>—</Typography>
-                    }
                   </TableCell>
 
                   {/* Source */}
