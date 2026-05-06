@@ -49,10 +49,10 @@ export function ContractDetail({ contract, onClose }: Props) {
 
       <DialogContent dividers sx={{ pt: 2 }}>
         <Box sx={{ display: 'flex', gap: 1, flexWrap: 'wrap', mb: 2 }}>
-          {contract.smeFlag === true && (
+          {(contract.sme_flag ?? contract.smeFlag) === true && (
             <Chip label="SME" size="small" sx={{ bgcolor: '#d4edda', color: '#155724', fontWeight: 700, fontSize: 11 }} />
           )}
-          {contract.smeFlag === false && (
+          {(contract.sme_flag ?? contract.smeFlag) === false && (
             <Chip label="Large" size="small" sx={{ bgcolor: '#f8d7da', color: '#721C24', fontWeight: 700, fontSize: 11 }} />
           )}
           {contract.sector && (
@@ -65,7 +65,7 @@ export function ContractDetail({ contract, onClose }: Props) {
           )}
         </Box>
 
-        <Box sx={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 2, mb: 2 }}>
+        <Box sx={{ display: 'grid', gridTemplateColumns: '1fr 1fr 1fr', gap: 1.5, mb: 2 }}>
           {[
             { label: 'Buyer', value: contract.buyer },
             { label: 'Supplier', value: contract.supplier || '—' },
@@ -74,7 +74,9 @@ export function ContractDetail({ contract, onClose }: Props) {
             { label: 'Deadline', value: contract.deadline ? new Date(contract.deadline).toLocaleDateString('en-GB') : '—' },
             { label: 'Published', value: contract.published ? new Date(contract.published).toLocaleDateString('en-GB') : '—' },
             { label: 'Source', value: contract.source || '—' },
-            { label: 'CPV Code', value: contract.cpvCode || '—' },
+            { label: 'CPV Code', value: contract.cpv_code || contract.cpvCode || '—' },
+            { label: 'Documents', value: contract.documents != null ? `${contract.documents} document${contract.documents !== 1 ? 's' : ''}` : '—' },
+            { label: 'Authority Type', value: contract.authority_type || '—' },
           ].map(({ label, value }) => (
             <Box key={label}>
               <Typography variant="caption" sx={{ color: '#6C757D', textTransform: 'uppercase', fontSize: 10, fontWeight: 600 }}>

@@ -17,18 +17,16 @@ function fmt(v?: number) {
 
 function fmtDate(d?: string) {
   if (!d) return '—'
-  return new Date(d).toLocaleDateString('en-GB', { day: 'numeric', month: 'short', year: '2-digit' })
+  try {
+    return new Date(d).toLocaleDateString('en-GB', { day: 'numeric', month: 'short', year: '2-digit' })
+  } catch { return '—' }
 }
 
-interface Props {
-  contracts: Contract[]
-  total: number
-  loading: boolean
-}
+interface Props { contracts: Contract[]; total: number; loading: boolean }
 
 export function ContractsList({ contracts, total, loading }: Props) {
   const { filters, setFilter, selectContract } = useContractStore()
-  const [orderBy, setOrderBy] = useState<string>('published')
+  const [orderBy, setOrderBy] = useState('published')
   const [order, setOrder] = useState<'asc' | 'desc'>('desc')
 
   const handleSort = (col: string) => {
@@ -37,22 +35,23 @@ export function ContractsList({ contracts, total, loading }: Props) {
   }
 
   const ColHead = ({ id, label }: { id: string; label: string }) => (
-    <TableCell sortDirection={orderBy === id ? order : false}>
+    <TableCell sortDirection={orderBy === id ? order : false} sx={{ whiteSpace: 'nowrap' }}>
       <TableSortLabel active={orderBy === id} direction={orderBy === id ? order : 'asc'} onClick={() => handleSort(id)}>
         {label}
       </TableSortLabel>
     </TableCell>
   )
 
+  // Resolve SME flag from either field name (API uses snake_case)
+  const getSmeFlag = (c: Contract) => c.sme_flag ?? c.smeFlag ?? null
+
   if (loading) {
     return (
       <Paper elevation={0} sx={{ borderRadius: 3, border: '1px solid #e8edf3', overflow: 'hidden' }}>
-        {[...Array(8)].map((_, i) => (
+        {[...Array(10)].map((_, i) => (
           <Box key={i} sx={{ display: 'flex', gap: 2, px: 2, py: 1.5, borderBottom: '1px solid #f0f2f5' }}>
-            <Skeleton width="35%" height={16} />
-            <Skeleton width="15%" height={16} />
-            <Skeleton width="10%" height={16} />
-            <Skeleton width="10%" height={16} />
+            <Skeleton width="35%" height={16} /><Skeleton width="20%" height={16} />
+            <Skeleton width="8%" height={16} /><Skeleton width="8%" height={16} />
           </Box>
         ))}
       </Paper>
@@ -62,8 +61,9 @@ export function ContractsList({ contracts, total, loading }: Props) {
   if (!contracts.length) {
     return (
       <Paper elevation={0} sx={{ borderRadius: 3, border: '1px solid #e8edf3', py: 8, textAlign: 'center' }}>
-        <Typography variant="h6" sx={{ fontSize: 16, color: '#6C757D' }}>No contracts found</Typography>
-        <Typography variant="body2" sx={{ mt: 1, color: '#9ca3af' }}>Try adjusting your filters</Typography>
+        <Typography sx={{ fontSize: 32, mb: 1 }}>🔍</Typography>
+        <Typography sx={{ fontSize: 15, fontWeight: 600, color: '#6C757D' }}>No contracts found</Typography>
+        <Typography variant="body2" sx={{ mt: 0.5, color: '#9ca3af' }}>Try adjusting your filters</Typography>
       </Paper>
     )
   }
@@ -79,62 +79,97 @@ export function ContractsList({ contracts, total, loading }: Props) {
               <ColHead id="value" label="Value" />
               <ColHead id="region" label="Region" />
               <ColHead id="deadline" label="Deadline" />
-              <TableCell>SME</TableCell>
+              <TableCell sx={{ whiteSpace: 'nowrap' }}>SME</TableCell>
+              <TableCell sx={{ whiteSpace: 'nowrap', display: { xs: 'none', lg: 'table-cell' } }}>Docs</TableCell>
+              <TableCell sx={{ whiteSpace: 'nowrap', display: { xs: 'none', xl: 'table-cell' } }}>Source</TableCell>
             </TableRow>
           </TableHead>
           <TableBody>
-            {contracts.map((c, i) => (
-              <TableRow
-                key={c.id || c.ocid || i}
-                hover
-                onClick={() => selectContract(c)}
-                sx={{ cursor: 'pointer', '&:hover': { bgcolor: '#f8faff' }, '&:last-child td': { border: 0 } }}
-                component={motion.tr as unknown as React.ElementType}
-                {...{ initial: { opacity: 0 }, animate: { opacity: 1 }, transition: { delay: i * 0.02 } }}
-              >
-                <TableCell sx={{ maxWidth: 280 }}>
-                  <Typography sx={{ fontSize: 12, fontWeight: 500, color: '#1F3A5F', overflow: 'hidden',
-                    textOverflow: 'ellipsis', whiteSpace: 'nowrap', lineHeight: 1.4 }}>
-                    {c.title}
-                  </Typography>
-                  {c.sector && (
-                    <Typography variant="caption" sx={{ color: '#6C757D', fontSize: 10 }}>{c.sector}</Typography>
-                  )}
-                </TableCell>
-                <TableCell sx={{ maxWidth: 160 }}>
-                  <Typography sx={{ fontSize: 11, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
-                    {c.buyer}
-                  </Typography>
-                </TableCell>
-                <TableCell>
-                  <Typography sx={{ fontSize: 12, fontWeight: 600, whiteSpace: 'nowrap', color: '#1F3A5F' }}>
-                    {fmt(c.value)}
-                  </Typography>
-                </TableCell>
-                <TableCell>
-                  <Typography sx={{ fontSize: 11, whiteSpace: 'nowrap', color: '#6C757D' }}>{c.region || '—'}</Typography>
-                </TableCell>
-                <TableCell>
-                  <Typography sx={{ fontSize: 11, whiteSpace: 'nowrap', color: '#6C757D' }}>{fmtDate(c.deadline)}</Typography>
-                </TableCell>
-                <TableCell>
-                  {c.smeFlag === true && (
-                    <Chip label="SME" size="small" sx={{ bgcolor: '#d4edda', color: '#155724', fontWeight: 700, fontSize: 10, height: 18 }} />
-                  )}
-                  {c.smeFlag === false && (
-                    <Chip label="Large" size="small" sx={{ bgcolor: '#f8d7da', color: '#721C24', fontWeight: 700, fontSize: 10, height: 18 }} />
-                  )}
-                </TableCell>
-              </TableRow>
-            ))}
+            {contracts.map((c, i) => {
+              const smeFlag = getSmeFlag(c)
+              return (
+                <TableRow
+                  key={c.id || c.ocid || i}
+                  hover
+                  onClick={() => selectContract(c)}
+                  sx={{ cursor: 'pointer', '&:hover': { bgcolor: '#f8faff' }, '&:last-child td': { border: 0 } }}
+                  component={motion.tr as unknown as React.ElementType}
+                  {...{ initial: { opacity: 0 }, animate: { opacity: 1 }, transition: { delay: Math.min(i * 0.015, 0.3) } }}
+                >
+                  {/* Title */}
+                  <TableCell sx={{ maxWidth: 300 }}>
+                    <Typography sx={{ fontSize: 12, fontWeight: 500, color: '#1F3A5F', overflow: 'hidden',
+                      textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
+                      {c.title}
+                    </Typography>
+                    {c.sector && (
+                      <Typography variant="caption" sx={{ color: '#6C757D', fontSize: 10 }}>{c.sector}</Typography>
+                    )}
+                  </TableCell>
+
+                  {/* Buyer */}
+                  <TableCell sx={{ maxWidth: 180 }}>
+                    <Typography sx={{ fontSize: 11, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
+                      {c.buyer}
+                    </Typography>
+                  </TableCell>
+
+                  {/* Value */}
+                  <TableCell>
+                    <Typography sx={{ fontSize: 12, fontWeight: 700, whiteSpace: 'nowrap',
+                      color: c.value >= 5_000_000 ? '#721C24' : '#1F3A5F' }}>
+                      {fmt(c.value)}
+                    </Typography>
+                  </TableCell>
+
+                  {/* Region */}
+                  <TableCell>
+                    <Typography sx={{ fontSize: 11, whiteSpace: 'nowrap', color: '#6C757D' }}>{c.region || '—'}</Typography>
+                  </TableCell>
+
+                  {/* Deadline */}
+                  <TableCell>
+                    <Typography sx={{ fontSize: 11, whiteSpace: 'nowrap', color: '#6C757D' }}>{fmtDate(c.deadline)}</Typography>
+                  </TableCell>
+
+                  {/* SME flag */}
+                  <TableCell>
+                    {smeFlag === true && (
+                      <Chip label="SME" size="small"
+                        sx={{ bgcolor: '#d4edda', color: '#155724', fontWeight: 700, fontSize: 10, height: 20 }} />
+                    )}
+                    {smeFlag === false && (
+                      <Chip label="Large" size="small"
+                        sx={{ bgcolor: '#f8d7da', color: '#721C24', fontWeight: 700, fontSize: 10, height: 20 }} />
+                    )}
+                    {smeFlag === null && (
+                      <Typography sx={{ fontSize: 10, color: '#9ca3af' }}>—</Typography>
+                    )}
+                  </TableCell>
+
+                  {/* Documents */}
+                  <TableCell sx={{ display: { xs: 'none', lg: 'table-cell' } }}>
+                    {c.documents != null && c.documents > 0
+                      ? <Chip label={`${c.documents} docs`} size="small" sx={{ fontSize: 10, height: 18, bgcolor: '#e8edf3', color: '#1F3A5F' }} />
+                      : <Typography sx={{ fontSize: 10, color: '#9ca3af' }}>—</Typography>
+                    }
+                  </TableCell>
+
+                  {/* Source */}
+                  <TableCell sx={{ display: { xs: 'none', xl: 'table-cell' } }}>
+                    {c.source && (
+                      <Chip label={c.source.replace('contracts-finder','CF').replace('find-a-tender','FTS').replace('spend-data','Spend')}
+                        size="small" sx={{ fontSize: 9, height: 18, bgcolor: '#f0f2f5', color: '#6C757D' }} />
+                    )}
+                  </TableCell>
+                </TableRow>
+              )
+            })}
           </TableBody>
         </Table>
       </TableContainer>
       <TablePagination
-        component="div"
-        count={total}
-        page={filters.page - 1}
-        rowsPerPage={20}
+        component="div" count={total} page={filters.page - 1} rowsPerPage={20}
         rowsPerPageOptions={[20]}
         onPageChange={(_, p) => setFilter('page', p + 1)}
         sx={{ borderTop: '1px solid #f0f2f5', '& .MuiTablePagination-displayedRows': { fontSize: 12 } }}

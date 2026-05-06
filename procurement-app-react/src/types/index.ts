@@ -6,15 +6,19 @@ export interface Contract {
   supplier?: string
   value: number
   region: string
-  cpvCode?: string
+  // snake_case matches actual API response
+  cpv_code?: string
+  cpvCode?: string       // alias kept for compat
   sector?: string
-  smeFlag: boolean | null
+  sme_flag: boolean | null
+  smeFlag?: boolean | null  // alias kept for compat
   deadline?: string
   published?: string
   status?: string
-  source?: 'contracts-finder' | 'find-a-tender' | 'spend-data'
+  source?: string
   documents?: number
   description?: string
+  authority_type?: string
 }
 
 export interface SavedContract extends Contract {

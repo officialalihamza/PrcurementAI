@@ -1,9 +1,9 @@
 import { useState } from 'react'
 import {
   Box, Typography, Tab, Tabs, Paper, Chip, LinearProgress,
-  Table, TableBody, TableCell, TableContainer, TableHead, TableRow,
 } from '@mui/material'
 import { motion } from 'framer-motion'
+import { useLocation, useNavigate } from 'react-router-dom'
 import {
   BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip,
   ResponsiveContainer, Cell, RadarChart, PolarGrid, PolarAngleAxis, Radar, Legend,
@@ -241,9 +241,19 @@ function AuthorityTab() {
 }
 
 const TABS = ['Barrier Correlations', 'Sector Profiles', 'Authority Comparison', 'Winnability Predictor', 'Language Detector']
+const TAB_PATHS = [
+  '/analytics/barriers',
+  '/analytics/barriers/sector-profiles',
+  '/analytics/barriers/institutional',
+  '/analytics/barriers/winnability',
+  '/analytics/barriers/language-detector',
+]
 
 export default function BarrierAnalysis() {
-  const [tab, setTab] = useState(0)
+  const location = useLocation()
+  const navigate = useNavigate()
+  const tab = TAB_PATHS.indexOf(location.pathname) >= 0 ? TAB_PATHS.indexOf(location.pathname) : 0
+  const setTab = (idx: number) => navigate(TAB_PATHS[idx])
 
   return (
     <Box>
@@ -258,7 +268,7 @@ export default function BarrierAnalysis() {
 
       <Paper elevation={0} sx={{ borderRadius: 3, border: '1px solid #e8edf3', mb: 3, overflow: 'hidden' }}>
         <Tabs
-          value={tab} onChange={(_, v) => setTab(v)} variant="scrollable" scrollButtons="auto"
+          value={tab} onChange={(_, v: number) => setTab(v)} variant="scrollable" scrollButtons="auto"
           sx={{ borderBottom: '1px solid #e8edf3', minHeight: 44,
             '& .MuiTab-root': { minHeight: 44, fontSize: 12, fontWeight: 500, textTransform: 'none' },
             '& .Mui-selected': { fontWeight: 700 } }}

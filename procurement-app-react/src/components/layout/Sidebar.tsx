@@ -103,23 +103,35 @@ export function Sidebar({ mobileOpen, onClose }: Props) {
                 style={{ overflow: 'hidden' }}
               >
                 <Box sx={{ ml: 2, borderLeft: '1px solid rgba(255,255,255,0.12)', pl: 1, py: 0.5 }}>
-                  {analyticsLinks.map((link) => (
-                    <ListItemButton
-                      key={link.path}
-                      onClick={() => nav(link.path)}
-                      sx={{
-                        borderRadius: 1.5, py: 0.75, px: 1.5, mb: 0.25,
-                        color: isActive(link.path) ? '#93c5fd' : 'rgba(255,255,255,0.6)',
-                        bgcolor: isActive(link.path) ? 'rgba(147,197,253,0.1)' : 'transparent',
-                        '&:hover': { bgcolor: 'rgba(255,255,255,0.06)', color: '#fff' },
-                      }}
-                    >
-                      <Typography sx={{ fontSize: 11, mr: 1 }}>{link.icon}</Typography>
-                      <Typography sx={{ fontSize: 12, fontWeight: isActive(link.path) ? 600 : 400 }}>
-                        {link.label}
-                      </Typography>
-                    </ListItemButton>
-                  ))}
+                  {analyticsLinks.map((link) => {
+                    const active = isActive(link.path)
+                    return (
+                      <ListItemButton
+                        key={link.path}
+                        onClick={() => nav(link.path)}
+                        sx={{
+                          borderRadius: 1.5, py: 0.75, px: 1.5, mb: 0.25,
+                          display: 'flex', alignItems: 'center', gap: 1,
+                          color: active ? '#fff' : 'rgba(255,255,255,0.75)',
+                          bgcolor: active ? 'rgba(147,197,253,0.18)' : 'transparent',
+                          borderLeft: active ? '2px solid #93c5fd' : '2px solid transparent',
+                          '&:hover': { bgcolor: 'rgba(255,255,255,0.1)', color: '#fff' },
+                        }}
+                      >
+                        <Box sx={{ fontSize: 13, lineHeight: 1, flexShrink: 0, width: 18, textAlign: 'center' }}>
+                          {link.icon}
+                        </Box>
+                        <Typography sx={{
+                          fontSize: 12,
+                          fontWeight: active ? 600 : 400,
+                          color: 'inherit',
+                          overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap',
+                        }}>
+                          {link.label}
+                        </Typography>
+                      </ListItemButton>
+                    )
+                  })}
                 </Box>
               </motion.div>
             )}
