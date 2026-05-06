@@ -50,6 +50,13 @@ const navCards = [
     desc: 'Hypothesis tests, sector logistic regression, regional competitiveness scoring',
     color: '#9333ea', bg: '#faf0ff',
   },
+  {
+    path: '/analytics/predictive',
+    icon: '📉',
+    title: 'Forecasting & Predictive Models',
+    desc: 'ARIMA 2027–2030 forecast, XGBoost vs Logistic vs Random Forest, OLS regression, K-Means clustering',
+    color: '#0e7490', bg: '#f0fdff',
+  },
 ]
 
 const BARRIER_DIMS = [

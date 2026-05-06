@@ -22,6 +22,7 @@ const analyticsLinks = [
   { label: 'Institutional',        path: '/analytics/barriers/institutional',        icon: '🏛️' },
   { label: 'Winnability',          path: '/analytics/barriers/winnability',          icon: '🎯' },
   { label: 'Language Detector',    path: '/analytics/barriers/language-detector',    icon: '🔍' },
+  { label: 'Forecasting',          path: '/analytics/predictive',                     icon: '📉' },
 ]
 
 interface Props {

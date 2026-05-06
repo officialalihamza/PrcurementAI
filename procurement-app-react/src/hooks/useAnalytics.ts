@@ -40,3 +40,24 @@ export const useRegionalCompetitiveness = () =>
     },
     staleTime: 1000 * 60 * 30,
   })
+
+export const useAnomalies = () =>
+  useQuery({
+    queryKey: ['anomalies'],
+    queryFn: async () => {
+      const { data } = await statsApi.anomalies()
+      return data.anomalies || data || []
+    },
+    staleTime: 1000 * 60 * 30,
+  })
+
+export const useAnalyticsStats = (params?: Record<string, unknown>) =>
+  useQuery({
+    queryKey: ['analytics-stats', params],
+    queryFn: async () => {
+      const { analyticsApi } = await import('../services/api')
+      const { data } = await analyticsApi.getStats(params)
+      return data
+    },
+    staleTime: 1000 * 60 * 10,
+  })

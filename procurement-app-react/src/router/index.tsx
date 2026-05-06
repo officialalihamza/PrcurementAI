@@ -14,6 +14,7 @@ const Settings            = lazy(() => import('../pages/Settings'))
 const Analytics           = lazy(() => import('../pages/analytics/Analytics'))
 const BarrierAnalysis     = lazy(() => import('../pages/analytics/BarrierAnalysis'))
 const StatisticalAnalysis = lazy(() => import('../pages/analytics/StatisticalAnalysis'))
+const PredictiveModels    = lazy(() => import('../pages/analytics/PredictiveModels'))
 
 function ProtectedRoute({ children }: { children: React.ReactNode }) {
   const { isAuthenticated, loading } = useAuthStore()
@@ -52,6 +53,10 @@ export function AppRouter() {
           <Route path="/analytics/barriers/institutional"           element={<BarrierAnalysis />} />
           <Route path="/analytics/barriers/winnability"             element={<BarrierAnalysis />} />
           <Route path="/analytics/barriers/language-detector"       element={<BarrierAnalysis />} />
+          <Route path="/analytics/predictive"                       element={<PredictiveModels />} />
+          <Route path="/analytics/predictive/models"                element={<PredictiveModels />} />
+          <Route path="/analytics/predictive/regression"            element={<PredictiveModels />} />
+          <Route path="/analytics/predictive/clustering"            element={<PredictiveModels />} />
         </Route>
 
         <Route path="*" element={<Navigate to="/" replace />} />
