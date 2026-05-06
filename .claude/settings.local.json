@@ -4,7 +4,8 @@
       "Bash(python -c ' *)",
       "Read(//d/University/FYP/**)",
       "Read(//d/University/FYP/Extracted Data/**)",
-      "Bash(python code/analysis/regression_analysis.py)"
+      "Bash(python code/analysis/regression_analysis.py)",
+      "Bash(git add *)"
     ]
   }
 }
