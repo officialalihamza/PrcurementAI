@@ -89,6 +89,31 @@
             :class="route.path === '/analytics/stats' ? 'text-brand-300 bg-brand-600/10' : 'text-slate-400 hover:text-white hover:bg-slate-800'">
             <span class="text-[10px]">🔬</span> Statistical Analysis
           </RouterLink>
+          <RouterLink to="/analytics/barriers" @click="mobileOpen = false"
+            class="flex items-center gap-2 px-2 py-2 rounded-md text-xs font-medium transition-all"
+            :class="route.path === '/analytics/barriers' ? 'text-brand-300 bg-brand-600/10' : 'text-slate-400 hover:text-white hover:bg-slate-800'">
+            <span class="text-[10px]">🚧</span> Barrier Overview
+          </RouterLink>
+          <RouterLink to="/analytics/barriers/sector-profiles" @click="mobileOpen = false"
+            class="flex items-center gap-2 px-2 py-2 rounded-md text-xs font-medium transition-all"
+            :class="route.path === '/analytics/barriers/sector-profiles' ? 'text-brand-300 bg-brand-600/10' : 'text-slate-400 hover:text-white hover:bg-slate-800'">
+            <span class="text-[10px]">📊</span> Sector Profiles
+          </RouterLink>
+          <RouterLink to="/analytics/barriers/institutional" @click="mobileOpen = false"
+            class="flex items-center gap-2 px-2 py-2 rounded-md text-xs font-medium transition-all"
+            :class="route.path === '/analytics/barriers/institutional' ? 'text-brand-300 bg-brand-600/10' : 'text-slate-400 hover:text-white hover:bg-slate-800'">
+            <span class="text-[10px]">🏛️</span> Institutional
+          </RouterLink>
+          <RouterLink to="/analytics/barriers/winnability" @click="mobileOpen = false"
+            class="flex items-center gap-2 px-2 py-2 rounded-md text-xs font-medium transition-all"
+            :class="route.path === '/analytics/barriers/winnability' ? 'text-brand-300 bg-brand-600/10' : 'text-slate-400 hover:text-white hover:bg-slate-800'">
+            <span class="text-[10px]">🎯</span> Winnability
+          </RouterLink>
+          <RouterLink to="/analytics/barriers/language-detector" @click="mobileOpen = false"
+            class="flex items-center gap-2 px-2 py-2 rounded-md text-xs font-medium transition-all"
+            :class="route.path === '/analytics/barriers/language-detector' ? 'text-brand-300 bg-brand-600/10' : 'text-slate-400 hover:text-white hover:bg-slate-800'">
+            <span class="text-[10px]">🔍</span> Language Detector
+          </RouterLink>
         </div>
       </div>
 

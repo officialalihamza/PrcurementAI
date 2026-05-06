@@ -78,6 +78,17 @@ export const statsApi = {
   invalidateCache:        () => api.post('/stats/invalidate-cache'),
 }
 
+// SME Barrier Analysis
+export const barriersApi = {
+  correlations:       () => api.get('/barriers/correlations'),
+  sectorProfiles:     () => api.get('/barriers/sector-profiles'),
+  authorityProfiles:  () => api.get('/barriers/authority-profiles'),
+  predictWinnability: (body) => api.post('/barriers/predict-winnability', body),
+  analyzeLanguage:    (text) => api.post('/barriers/analyze-language', { text }),
+  summary:            () => api.get('/barriers/summary'),
+  invalidateCache:    () => api.post('/barriers/invalidate-cache'),
+}
+
 // Alerts
 export const alertsApi = {
   list: () => api.get('/alerts'),

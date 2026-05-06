@@ -10,6 +10,11 @@ const routes = [
   { path: '/contracts', name: 'Contracts', component: () => import('@/views/Contracts.vue'), meta: { requiresAuth: true } },
   { path: '/analytics', name: 'Analytics', component: () => import('@/views/Analytics.vue'), meta: { requiresAuth: true } },
   { path: '/analytics/stats', name: 'StatisticalAnalysis', component: () => import('@/views/analytics/StatisticalAnalysis.vue'), meta: { requiresAuth: true } },
+  { path: '/analytics/barriers', name: 'BarrierDashboard', component: () => import('@/views/analytics/barriers/BarrierDashboard.vue'), meta: { requiresAuth: true } },
+  { path: '/analytics/barriers/sector-profiles', name: 'BarrierSectors', component: () => import('@/views/analytics/barriers/SectorProfiles.vue'), meta: { requiresAuth: true } },
+  { path: '/analytics/barriers/institutional', name: 'BarrierInstitutional', component: () => import('@/views/analytics/barriers/Institutional.vue'), meta: { requiresAuth: true } },
+  { path: '/analytics/barriers/winnability', name: 'Winnability', component: () => import('@/views/analytics/barriers/Winnability.vue'), meta: { requiresAuth: true } },
+  { path: '/analytics/barriers/language-detector', name: 'LanguageDetector', component: () => import('@/views/analytics/barriers/LanguageDetector.vue'), meta: { requiresAuth: true } },
   { path: '/settings', name: 'Settings', component: () => import('@/views/Settings.vue'), meta: { requiresAuth: true } },
   { path: '/:pathMatch(.*)*', redirect: '/' },
 ]
