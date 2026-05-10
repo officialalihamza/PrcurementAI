@@ -39,8 +39,14 @@ async def search_contracts(
 ):
     src = source if source in _VALID_SOURCES else "all"
 
+    # Fold sector into keyword so CF/FTS API does full-text search at source
+    # (post-filter alone is useless — most contracts have no CPV codes)
+    effective_keyword = keyword
+    if sector:
+        effective_keyword = f"{keyword} {sector}".strip() if keyword else sector
+
     result = await unified.search(
-        keyword=keyword,
+        keyword=effective_keyword,
         regions=regions or [],
         cpv=cpv or [],
         value_min=value_min,

@@ -76,6 +76,11 @@ def _parse(release: dict) -> Optional[dict]:
         return None
 
 
+def _region_match(contract_region: str, filter_regions: list) -> bool:
+    cr = contract_region.lower()
+    return any(r.lower() in cr or cr in r.lower() for r in filter_regions)
+
+
 def search(
     keyword: Optional[str] = None,
     regions: list = [],
@@ -117,7 +122,7 @@ def search(
         c = _parse(rel)
         if not c:
             continue
-        if regions and c["region"] not in regions:
+        if regions and not _region_match(c.get("region", ""), regions):
             continue
         if sme_flag == "sme"   and c["sme_suitable"] is False:
             continue

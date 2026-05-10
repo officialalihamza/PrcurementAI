@@ -139,6 +139,11 @@ def _row_to_contract(row: dict) -> Optional[dict]:
         return None
 
 
+def _region_match(contract_region: str, filter_regions: list) -> bool:
+    cr = contract_region.lower()
+    return any(r.lower() in cr or cr in r.lower() for r in filter_regions)
+
+
 def search(
     keyword: Optional[str] = None,
     regions: list = [],
@@ -173,7 +178,7 @@ def search(
             continue
         if date_to and c["published"] and c["published"] > date_to:
             continue
-        if regions and c["region"] not in regions:
+        if regions and not _region_match(c.get("region", ""), regions):
             continue
         contracts.append(c)
 
