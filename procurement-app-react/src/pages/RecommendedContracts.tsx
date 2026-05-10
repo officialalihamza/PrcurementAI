@@ -13,7 +13,7 @@ import TrendingUpIcon       from '@mui/icons-material/TrendingUp'
 import LocationOnIcon       from '@mui/icons-material/LocationOn'
 import AttachMoneyIcon      from '@mui/icons-material/AttachMoney'
 import { matchingApi }      from '../services/api'
-import type { ContractMatch } from '../types'
+import type { ContractMatch, ContractSnapshot } from '../types'
 
 const REC_COLORS: Record<string, { bg: string; color: string }> = {
   'Strong Match':   { bg: '#dcfce7', color: '#15803d' },
@@ -56,7 +56,7 @@ function fmtValue(lo?: number, hi?: number) {
 
 function MatchCard({ match }: { match: ContractMatch }) {
   const [expanded, setExpanded] = useState(false)
-  const c   = match.contract || {}
+  const c: ContractSnapshot = match.contract_snapshot || match.contract as ContractSnapshot || {}
   const rec = REC_COLORS[match.recommendation] || REC_COLORS['Weak Match']
 
   return (
@@ -69,31 +69,29 @@ function MatchCard({ match }: { match: ContractMatch }) {
           <Box sx={{ flex: 1, minWidth: 0 }}>
             <Box sx={{ display: 'flex', alignItems: 'center', gap: 1, mb: 0.5, flexWrap: 'wrap' }}>
               <Typography sx={{ fontSize: 14, fontWeight: 700, color: '#1F3A5F', flex: 1 }}>
-                {(c as { title?: string }).title || 'Untitled Contract'}
+                {c.title || 'Untitled Contract'}
               </Typography>
               <Chip label={match.recommendation} size="small"
                 sx={{ fontSize: 11, fontWeight: 600, bgcolor: rec.bg, color: rec.color }} />
             </Box>
             <Box sx={{ display: 'flex', gap: 2, flexWrap: 'wrap' }}>
-              {(c as { buyer?: string }).buyer && (
-                <Typography sx={{ fontSize: 12, color: '#64748b' }}>
-                  {(c as { buyer?: string }).buyer}
-                </Typography>
+              {c.buyer && (
+                <Typography sx={{ fontSize: 12, color: '#64748b' }}>{c.buyer}</Typography>
               )}
-              {(c as { region?: string }).region && (
+              {c.region && (
                 <Box sx={{ display: 'flex', alignItems: 'center', gap: 0.25 }}>
                   <LocationOnIcon sx={{ fontSize: 12, color: '#94a3b8' }} />
-                  <Typography sx={{ fontSize: 12, color: '#64748b' }}>{(c as { region?: string }).region}</Typography>
+                  <Typography sx={{ fontSize: 12, color: '#64748b' }}>{c.region}</Typography>
                 </Box>
               )}
               <Box sx={{ display: 'flex', alignItems: 'center', gap: 0.25 }}>
                 <AttachMoneyIcon sx={{ fontSize: 12, color: '#94a3b8' }} />
                 <Typography sx={{ fontSize: 12, color: '#64748b' }}>
-                  {fmtValue((c as { value_low?: number }).value_low, (c as { value_high?: number }).value_high)}
+                  {fmtValue(c.value_low, c.value_high)}
                 </Typography>
               </Box>
-              {(c as { sector?: string }).sector && (
-                <Chip label={(c as { sector?: string }).sector} size="small"
+              {c.sector && (
+                <Chip label={c.sector} size="small"
                   sx={{ fontSize: 10, bgcolor: '#f1f5f9', color: '#475569', height: 18 }} />
               )}
             </Box>
@@ -103,10 +101,10 @@ function MatchCard({ match }: { match: ContractMatch }) {
               sx={{ fontSize: 11, textTransform: 'none', color: '#64748b', minWidth: 'auto', px: 1 }}>
               {expanded ? 'Less' : 'Details'}
             </Button>
-            {(c as { url?: string }).url && (
+            {c.url && (
               <Tooltip title="View contract">
                 <Button size="small" variant="outlined" component="a"
-                  href={(c as { url?: string }).url} target="_blank" rel="noopener noreferrer"
+                  href={c.url} target="_blank" rel="noopener noreferrer"
                   sx={{ minWidth: 32, p: 0.5, borderColor: '#e2e8f0' }}>
                   <OpenInNewIcon sx={{ fontSize: 14 }} />
                 </Button>

@@ -63,8 +63,12 @@ CREATE TABLE IF NOT EXISTS contract_matches (
   timeline_capacity_score   numeric,
   compliance_score          numeric,
   recommendation            text,
+  contract_snapshot         jsonb,
   scored_at                 timestamptz DEFAULT now()
 );
+
+-- If table already exists without this column, add it:
+ALTER TABLE contract_matches ADD COLUMN IF NOT EXISTS contract_snapshot jsonb;
 
 CREATE INDEX IF NOT EXISTS idx_contract_matches_company ON contract_matches(company_id);
 CREATE INDEX IF NOT EXISTS idx_contract_matches_score   ON contract_matches(total_score DESC);

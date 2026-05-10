@@ -155,6 +155,19 @@ export interface Company {
   created_at?: string
 }
 
+export interface ContractSnapshot {
+  title?: string
+  buyer?: string
+  sector?: string
+  region?: string
+  value_low?: number
+  value_high?: number
+  cpv_code?: string
+  status?: string
+  url?: string
+  source?: string
+}
+
 export interface ContractMatch {
   id: string
   company_id: string
@@ -170,6 +183,7 @@ export interface ContractMatch {
   compliance_score: number
   recommendation: string
   scored_at: string
+  contract_snapshot?: ContractSnapshot
   contract?: Contract
 }
 
