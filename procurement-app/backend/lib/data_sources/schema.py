@@ -59,6 +59,10 @@ def make_contract(
     supplier_sic=None,
     match_score: int = 0,
 ) -> dict:
+    codes = cpv_codes or []
+    descs = cpv_descriptions or []
+    # Derive top-level sector from first CPV code prefix
+    sector = descs[0] if descs else (CPV_LABELS.get((codes[0] if codes else "")[:2], "") if codes else "")
     return {
         "ocid":                ocid,
         "source":              source,
@@ -69,8 +73,9 @@ def make_contract(
         "value":               float(value) if value is not None else None,
         "currency":            currency,
         "region":              region or "Unknown",
-        "cpv_codes":           cpv_codes or [],
-        "cpv_descriptions":    cpv_descriptions or [],
+        "sector":              sector,
+        "cpv_codes":           codes,
+        "cpv_descriptions":    descs,
         "sme_suitable":        sme_suitable,
         "status":              status,
         "published":           published,

@@ -40,6 +40,9 @@ def _run_spend(kwargs: dict) -> dict:
         return {"contracts": [], "total": 0, "source": SOURCE_SPEND, "error": str(e)}
 
 
+_ACTIVE_STATUSES = {"active", "tender", "planned", "planning", "open", "pending"}
+
+
 async def search(
     keyword: Optional[str] = None,
     regions: list = [],
@@ -49,6 +52,8 @@ async def search(
     date_from: Optional[str] = None,
     date_to: Optional[str] = None,
     sme_flag: Optional[str] = None,
+    status_filter: Optional[str] = None,
+    sector: Optional[str] = None,
     page: int = 1,
     page_size: int = 20,
     source: str = "all",
@@ -110,6 +115,25 @@ async def search(
         key=lambda c: (c.get("published") or "", c.get("value") or 0),
         reverse=True,
     )
+
+    # Post-filter: status
+    if status_filter and status_filter not in ("all", ""):
+        if status_filter == "active":
+            all_contracts = [c for c in all_contracts
+                             if (c.get("status") or "").lower() in _ACTIVE_STATUSES]
+        else:
+            all_contracts = [c for c in all_contracts
+                             if (c.get("status") or "").lower() == status_filter.lower()]
+
+    # Post-filter: sector (match against sector field or any cpv_description)
+    if sector:
+        s_lower = sector.lower()
+        all_contracts = [
+            c for c in all_contracts
+            if s_lower in (c.get("sector") or "").lower()
+            or any(s_lower in (d or "").lower() for d in c.get("cpv_descriptions") or [])
+            or s_lower in (c.get("title") or "").lower()
+        ]
 
     if enrich:
         ch.enrich(all_contracts)
