@@ -1,9 +1,13 @@
+import { useState } from 'react'
 import {
-  Box, Typography, TextField, Select, MenuItem, FormControl,
-  InputLabel, Button, Divider, ToggleButtonGroup, ToggleButton,
+  Box, TextField, Select, MenuItem, FormControl,
+  InputLabel, Button, ToggleButtonGroup, ToggleButton,
+  Collapse, InputAdornment, Chip,
 } from '@mui/material'
-import FilterListIcon from '@mui/icons-material/FilterList'
-import ClearIcon from '@mui/icons-material/Clear'
+import SearchIcon        from '@mui/icons-material/Search'
+import TuneIcon          from '@mui/icons-material/Tune'
+import CloseIcon         from '@mui/icons-material/Close'
+import KeyboardArrowDownIcon from '@mui/icons-material/KeyboardArrowDown'
 import { useContractStore } from '../../store/contractStore'
 
 const SECTORS = [
@@ -17,98 +21,123 @@ const REGIONS = [
   'North East', 'East Midlands', 'South West', 'Northern Ireland',
 ]
 
+const selectSx = {
+  fontSize: 13, height: 40, bgcolor: '#fff',
+  '& .MuiOutlinedInput-notchedOutline': { borderColor: '#e2e8f0' },
+  '&:hover .MuiOutlinedInput-notchedOutline': { borderColor: '#94a3b8' },
+}
+
 export function ContractFilters() {
   const { filters, setFilter, resetFilters } = useContractStore()
+  const [showMore, setShowMore] = useState(false)
+
+  const activeExtraCount = [
+    filters.min_value, filters.max_value,
+  ].filter(Boolean).length
 
   return (
-    <Box sx={{
-      width: 240, flexShrink: 0, bgcolor: '#fff', borderRadius: 3,
-      border: '1px solid #e8edf3', p: 2.5, alignSelf: 'flex-start',
-      position: 'sticky', top: 80,
-    }}>
-      <Box sx={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', mb: 2 }}>
-        <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
-          <FilterListIcon sx={{ fontSize: 18, color: '#2E75B6' }} />
-          <Typography variant="h6" sx={{ fontSize: 14, fontWeight: 600 }}>Filters</Typography>
-        </Box>
-        <Button size="small" startIcon={<ClearIcon />} onClick={resetFilters}
-          sx={{ fontSize: 11, color: '#6C757D', minWidth: 0, px: 1 }}>
-          Clear
-        </Button>
-      </Box>
+    <Box sx={{ bgcolor: '#fff', borderRadius: 3, border: '1px solid #e2e8f0', p: 2, mb: 2.5 }}>
 
-      <Box sx={{ display: 'flex', flexDirection: 'column', gap: 2 }}>
+      {/* Row 1: search + dropdowns + toggles */}
+      <Box sx={{ display: 'flex', gap: 1.5, flexWrap: 'wrap', alignItems: 'center' }}>
+
+        {/* Search */}
         <TextField
-          label="Search" placeholder="Keywords…" size="small" fullWidth
+          placeholder="Search contracts, buyers, keywords…"
+          size="small"
           value={filters.q}
           onChange={(e) => setFilter('q', e.target.value)}
-          sx={{ '& input': { fontSize: 13 } }}
+          sx={{ flex: '1 1 260px', '& input': { fontSize: 13 }, '& .MuiOutlinedInput-root': { height: 40, bgcolor: '#f8fafc', '& fieldset': { borderColor: '#e2e8f0' }, '&:hover fieldset': { borderColor: '#94a3b8' } } }}
+          slotProps={{ input: { startAdornment: <InputAdornment position="start"><SearchIcon sx={{ fontSize: 17, color: '#94a3b8' }} /></InputAdornment> } }}
         />
 
-        <FormControl size="small" fullWidth>
+        {/* Sector */}
+        <FormControl size="small" sx={{ minWidth: 160, flex: '0 0 auto' }}>
           <InputLabel sx={{ fontSize: 13 }}>Sector</InputLabel>
-          <Select label="Sector" value={filters.sector} onChange={(e) => setFilter('sector', e.target.value)}
-            sx={{ fontSize: 13 }}>
-            {SECTORS.map((s) => <MenuItem key={s} value={s} sx={{ fontSize: 13 }}>{s || 'All sectors'}</MenuItem>)}
+          <Select label="Sector" value={filters.sector ?? ''}
+            onChange={(e) => setFilter('sector', e.target.value)}
+            sx={selectSx} IconComponent={KeyboardArrowDownIcon}>
+            {SECTORS.map(s => <MenuItem key={s} value={s} sx={{ fontSize: 13 }}>{s || 'All sectors'}</MenuItem>)}
           </Select>
         </FormControl>
 
-        <FormControl size="small" fullWidth>
+        {/* Region */}
+        <FormControl size="small" sx={{ minWidth: 160, flex: '0 0 auto' }}>
           <InputLabel sx={{ fontSize: 13 }}>Region</InputLabel>
-          <Select label="Region" value={filters.region} onChange={(e) => setFilter('region', e.target.value)}
-            sx={{ fontSize: 13 }}>
-            {REGIONS.map((r) => <MenuItem key={r} value={r} sx={{ fontSize: 13 }}>{r || 'All regions'}</MenuItem>)}
+          <Select label="Region" value={filters.region ?? ''}
+            onChange={(e) => setFilter('region', e.target.value)}
+            sx={selectSx} IconComponent={KeyboardArrowDownIcon}>
+            {REGIONS.map(r => <MenuItem key={r} value={r} sx={{ fontSize: 13 }}>{r || 'All regions'}</MenuItem>)}
           </Select>
         </FormControl>
 
-        <Divider />
+        {/* SME toggle */}
+        <ToggleButtonGroup
+          value={filters.sme_flag ?? ''} exclusive size="small"
+          onChange={(_, v) => setFilter('sme_flag', v ?? '')}
+          sx={{ height: 40, bgcolor: '#f8fafc', border: '1px solid #e2e8f0', borderRadius: 2,
+            '& .MuiToggleButton-root': { border: 'none', fontSize: 12, px: 1.75, fontWeight: 500, color: '#64748b', '&.Mui-selected': { bgcolor: '#1d4ed8', color: '#fff' } },
+          }}
+        >
+          <ToggleButton value="">All</ToggleButton>
+          <ToggleButton value="true" sx={{ '&.Mui-selected': { bgcolor: '#15803d !important', color: '#fff !important' } }}>SME</ToggleButton>
+          <ToggleButton value="false" sx={{ '&.Mui-selected': { bgcolor: '#b91c1c !important', color: '#fff !important' } }}>Large</ToggleButton>
+        </ToggleButtonGroup>
 
-        <Box>
-          <Typography variant="caption" sx={{ color: '#6C757D', fontWeight: 600, textTransform: 'uppercase', letterSpacing: '0.06em', fontSize: 10 }}>
-            SME Status
-          </Typography>
-          <ToggleButtonGroup
-            value={filters.sme_flag} exclusive size="small" fullWidth
-            onChange={(_, v) => setFilter('sme_flag', v ?? '')}
-            sx={{ mt: 1 }}
+        {/* Status toggle */}
+        <ToggleButtonGroup
+          value={filters.status ?? 'active'} exclusive size="small"
+          onChange={(_, v) => setFilter('status', v ?? 'active')}
+          sx={{ height: 40, bgcolor: '#f8fafc', border: '1px solid #e2e8f0', borderRadius: 2,
+            '& .MuiToggleButton-root': { border: 'none', fontSize: 12, px: 1.75, fontWeight: 500, color: '#64748b', '&.Mui-selected': { bgcolor: '#1d4ed8', color: '#fff' } },
+          }}
+        >
+          <ToggleButton value="active">Active</ToggleButton>
+          <ToggleButton value="">All</ToggleButton>
+        </ToggleButtonGroup>
+
+        {/* More / Clear */}
+        <Box sx={{ display: 'flex', gap: 1, ml: 'auto' }}>
+          <Button
+            size="small" variant="outlined" startIcon={<TuneIcon sx={{ fontSize: 15 }} />}
+            onClick={() => setShowMore(v => !v)}
+            sx={{ height: 40, fontSize: 12, borderColor: '#e2e8f0', color: '#475569', textTransform: 'none',
+              '&:hover': { borderColor: '#94a3b8', bgcolor: '#f8fafc' } }}
           >
-            <ToggleButton value="" sx={{ fontSize: 11, py: 0.5 }}>All</ToggleButton>
-            <ToggleButton value="true" sx={{ fontSize: 11, py: 0.5, '&.Mui-selected': { bgcolor: '#d4edda', color: '#155724' } }}>SME</ToggleButton>
-            <ToggleButton value="false" sx={{ fontSize: 11, py: 0.5, '&.Mui-selected': { bgcolor: '#f8d7da', color: '#721C24' } }}>Large</ToggleButton>
-          </ToggleButtonGroup>
-        </Box>
-
-        <Box>
-          <Typography variant="caption" sx={{ color: '#6C757D', fontWeight: 600, textTransform: 'uppercase', letterSpacing: '0.06em', fontSize: 10 }}>
-            Status
-          </Typography>
-          <ToggleButtonGroup
-            value={filters.status} exclusive size="small" fullWidth
-            onChange={(_, v) => setFilter('status', v ?? 'active')}
-            sx={{ mt: 1 }}
+            More filters
+            {activeExtraCount > 0 && (
+              <Chip label={activeExtraCount} size="small"
+                sx={{ ml: 0.75, height: 18, fontSize: 10, bgcolor: '#1d4ed8', color: '#fff', fontWeight: 700 }} />
+            )}
+          </Button>
+          <Button
+            size="small" startIcon={<CloseIcon sx={{ fontSize: 15 }} />}
+            onClick={resetFilters}
+            sx={{ height: 40, fontSize: 12, color: '#94a3b8', textTransform: 'none',
+              '&:hover': { bgcolor: '#f8fafc', color: '#475569' } }}
           >
-            <ToggleButton value="active" sx={{ fontSize: 11, py: 0.5 }}>Active</ToggleButton>
-            <ToggleButton value="" sx={{ fontSize: 11, py: 0.5 }}>All</ToggleButton>
-          </ToggleButtonGroup>
-        </Box>
-
-        <Divider />
-
-        <Box sx={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 1 }}>
-          <TextField
-            label="Min £" type="number" size="small"
-            value={filters.min_value}
-            onChange={(e) => setFilter('min_value', e.target.value)}
-            sx={{ '& input': { fontSize: 12 } }}
-          />
-          <TextField
-            label="Max £" type="number" size="small"
-            value={filters.max_value}
-            onChange={(e) => setFilter('max_value', e.target.value)}
-            sx={{ '& input': { fontSize: 12 } }}
-          />
+            Clear
+          </Button>
         </Box>
       </Box>
+
+      {/* Row 2: expanded filters */}
+      <Collapse in={showMore}>
+        <Box sx={{ display: 'flex', gap: 1.5, mt: 1.5, pt: 1.5, borderTop: '1px solid #f1f5f9', flexWrap: 'wrap', alignItems: 'center' }}>
+          <TextField
+            label="Min value (£)" type="number" size="small"
+            value={filters.min_value ?? ''}
+            onChange={(e) => setFilter('min_value', e.target.value)}
+            sx={{ width: 150, '& input': { fontSize: 13 }, '& .MuiOutlinedInput-root': { height: 40, '& fieldset': { borderColor: '#e2e8f0' } } }}
+          />
+          <TextField
+            label="Max value (£)" type="number" size="small"
+            value={filters.max_value ?? ''}
+            onChange={(e) => setFilter('max_value', e.target.value)}
+            sx={{ width: 150, '& input': { fontSize: 13 }, '& .MuiOutlinedInput-root': { height: 40, '& fieldset': { borderColor: '#e2e8f0' } } }}
+          />
+        </Box>
+      </Collapse>
     </Box>
   )
 }
