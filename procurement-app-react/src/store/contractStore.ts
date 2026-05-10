@@ -16,6 +16,7 @@ interface ContractState {
   filters: Filters
   selectedContract: Contract | null
   setFilter: (key: keyof Filters, value: string | number) => void
+  applyFilters: (draft: Partial<Filters>) => void
   resetFilters: () => void
   selectContract: (c: Contract | null) => void
 }
@@ -36,6 +37,8 @@ export const useContractStore = create<ContractState>((set) => ({
         page: key === 'page' ? Number(value) : 1,
       },
     })),
+  applyFilters: (draft) =>
+    set((s) => ({ filters: { ...s.filters, ...draft, page: 1 } })),
   resetFilters: () => set({ filters: defaults }),
   selectContract: (c) => set({ selectedContract: c }),
 }))
