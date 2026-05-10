@@ -7,7 +7,7 @@ import { useContracts }    from '../hooks/useContracts'
 import { useContractStore } from '../store/contractStore'
 
 export default function Contracts() {
-  const { data, isLoading }              = useContracts()
+  const { data, isLoading, isFetching }  = useContracts()
   const { selectedContract, selectContract } = useContractStore()
 
   const contracts = data?.contracts || []
@@ -31,7 +31,7 @@ export default function Contracts() {
 
       {/* Results table */}
       <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} transition={{ duration: 0.4, delay: 0.15 }}>
-        <ContractsList contracts={contracts} total={total} loading={isLoading} />
+        <ContractsList contracts={contracts} total={total} loading={isLoading || isFetching} />
       </motion.div>
 
       <ContractDetail contract={selectedContract} onClose={() => selectContract(null)} />

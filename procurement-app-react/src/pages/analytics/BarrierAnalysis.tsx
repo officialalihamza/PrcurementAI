@@ -9,8 +9,6 @@ import {
   ResponsiveContainer, Cell, RadarChart, PolarGrid, PolarAngleAxis, Radar, Legend,
 } from 'recharts'
 import { useBarrierCorrelations, useSectorProfiles, useAuthorityProfiles } from '../../hooks/useBarriers'
-import { WinnabilityPredictor } from '../../components/analytics/WinnabilityPredictor'
-import { LanguageDetector } from '../../components/analytics/LanguageDetector'
 import { LoadingSpinner } from '../../components/common/LoadingSpinner'
 import type { BarrierCorrelation, SectorProfile, AuthorityProfile } from '../../types'
 
@@ -240,13 +238,11 @@ function AuthorityTab() {
   )
 }
 
-const TABS = ['Barrier Correlations', 'Sector Profiles', 'Authority Comparison', 'Winnability Predictor', 'Language Detector']
+const TABS = ['Barrier Correlations', 'Sector Profiles', 'Authority Comparison']
 const TAB_PATHS = [
   '/analytics/barriers',
   '/analytics/barriers/sector-profiles',
   '/analytics/barriers/institutional',
-  '/analytics/barriers/winnability',
-  '/analytics/barriers/language-detector',
 ]
 
 export default function BarrierAnalysis() {
@@ -281,8 +277,6 @@ export default function BarrierAnalysis() {
         {tab === 0 && <BarrierCorrelationsTab />}
         {tab === 1 && <SectorProfilesTab />}
         {tab === 2 && <AuthorityTab />}
-        {tab === 3 && <WinnabilityPredictor />}
-        {tab === 4 && <LanguageDetector />}
       </motion.div>
 
       <Box sx={{ mt: 3 }}>

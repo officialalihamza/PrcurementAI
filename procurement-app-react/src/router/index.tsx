@@ -17,6 +17,8 @@ const StatisticalAnalysis    = lazy(() => import('../pages/analytics/Statistical
 const PredictiveModels       = lazy(() => import('../pages/analytics/PredictiveModels'))
 const EnhancedOnboarding     = lazy(() => import('../pages/EnhancedOnboarding'))
 const RecommendedContracts   = lazy(() => import('../pages/RecommendedContracts'))
+const WinnabilityPage        = lazy(() => import('../pages/analytics/WinnabilityPage'))
+const LanguageDetectorPage   = lazy(() => import('../pages/analytics/LanguageDetectorPage'))
 
 function ProtectedRoute({ children }: { children: React.ReactNode }) {
   const { isAuthenticated, loading } = useAuthStore()
@@ -55,8 +57,8 @@ export function AppRouter() {
           <Route path="/analytics/barriers"                         element={<BarrierAnalysis />} />
           <Route path="/analytics/barriers/sector-profiles"         element={<BarrierAnalysis />} />
           <Route path="/analytics/barriers/institutional"           element={<BarrierAnalysis />} />
-          <Route path="/analytics/barriers/winnability"             element={<BarrierAnalysis />} />
-          <Route path="/analytics/barriers/language-detector"       element={<BarrierAnalysis />} />
+          <Route path="/winnability"       element={<WinnabilityPage />} />
+          <Route path="/language-detector" element={<LanguageDetectorPage />} />
           <Route path="/analytics/predictive"                       element={<PredictiveModels />} />
           <Route path="/analytics/predictive/models"                element={<PredictiveModels />} />
           <Route path="/analytics/predictive/regression"            element={<PredictiveModels />} />

@@ -42,9 +42,9 @@ const ANALYTICS_SUB = [
 ]
 
 const TOOL_ITEMS = [
-  { label: 'Winnability',       path: '/analytics/barriers/winnability',         Icon: TrackChangesOutlinedIcon },
-  { label: 'Language Detector', path: '/analytics/barriers/language-detector',   Icon: FindInPageOutlinedIcon },
-  { label: 'Forecasting',       path: '/analytics/predictive',                   Icon: ShowChartOutlinedIcon },
+  { label: 'Winnability',       path: '/winnability',        Icon: TrackChangesOutlinedIcon },
+  { label: 'Language Detector', path: '/language-detector',  Icon: FindInPageOutlinedIcon },
+  { label: 'Forecasting',       path: '/analytics/predictive', Icon: ShowChartOutlinedIcon },
 ]
 
 // ── Style helpers ─────────────────────────────────────────────────────────────

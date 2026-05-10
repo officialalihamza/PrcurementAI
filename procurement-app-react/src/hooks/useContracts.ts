@@ -15,6 +15,7 @@ export const useContracts = () => {
     },
     placeholderData: (prev) => prev,
     staleTime: 1000 * 60 * 2,
+    // isFetching is true on every refetch (filter change), isLoading only on first load
   })
 }
 
