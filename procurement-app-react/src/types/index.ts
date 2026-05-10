@@ -123,6 +123,67 @@ export interface DashboardStats {
   top_sectors?: { sector: string; count: number; sme_rate: number }[]
 }
 
+export interface Company {
+  id: string
+  user_id: string
+  name: string
+  company_number?: string
+  sic_codes?: string[]
+  postcode?: string
+  region?: string
+  employees?: number
+  turnover?: number
+  legal_structure?: string
+  incorporation_date?: string
+  primary_sectors?: string[]
+  geographic_coverage?: string
+  regions_active?: string[]
+  years_public_sector?: number
+  past_contract_count?: number
+  past_contract_total_value?: number
+  certifications?: string[]
+  has_iso_9001?: boolean
+  has_iso_27001?: boolean
+  has_cyber_essentials?: boolean
+  has_modern_slavery?: boolean
+  has_gdpr_docs?: boolean
+  has_public_liability?: boolean
+  turnover_latest?: number
+  credit_rating?: string
+  onboarding_completed?: boolean
+  onboarding_step?: number
+  created_at?: string
+}
+
+export interface ContractMatch {
+  id: string
+  company_id: string
+  contract_id: string
+  total_score: number
+  size_fit_score: number
+  sector_match_score: number
+  experience_score: number
+  capability_score: number
+  financial_health_score: number
+  geographic_fit_score: number
+  timeline_capacity_score: number
+  compliance_score: number
+  recommendation: string
+  scored_at: string
+  contract?: Contract
+}
+
+export interface CompanyDocument {
+  id: string
+  company_id: string
+  file_name: string
+  file_path: string
+  doc_type: string
+  file_size?: number
+  uploaded_at: string
+  signed_url?: string
+}
+
 export interface User {
   id: string
   email: string

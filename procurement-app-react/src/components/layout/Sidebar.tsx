@@ -17,6 +17,8 @@ import ShowChartOutlinedIcon        from '@mui/icons-material/ShowChartOutlined'
 import SettingsOutlinedIcon         from '@mui/icons-material/SettingsOutlined'
 import ExpandLessIcon               from '@mui/icons-material/ExpandLess'
 import ExpandMoreIcon               from '@mui/icons-material/ExpandMore'
+import AutoAwesomeOutlinedIcon      from '@mui/icons-material/AutoAwesomeOutlined'
+import BusinessOutlinedIcon         from '@mui/icons-material/BusinessOutlined'
 import { useLocation, useNavigate } from 'react-router-dom'
 import { motion, AnimatePresence }  from 'framer-motion'
 
@@ -25,8 +27,10 @@ const DRAWER_WIDTH = 252
 // ── Section definitions ───────────────────────────────────────────────────────
 
 const MAIN_ITEMS = [
-  { label: 'Dashboard', path: '/dashboard', Icon: DashboardOutlinedIcon },
-  { label: 'Contracts',  path: '/contracts',  Icon: SearchOutlinedIcon },
+  { label: 'Dashboard',        path: '/dashboard',       Icon: DashboardOutlinedIcon },
+  { label: 'Contracts',        path: '/contracts',        Icon: SearchOutlinedIcon },
+  { label: 'Recommended',      path: '/recommendations',  Icon: AutoAwesomeOutlinedIcon },
+  { label: 'Company Profile',  path: '/profile-setup',    Icon: BusinessOutlinedIcon },
 ]
 
 const ANALYTICS_SUB = [

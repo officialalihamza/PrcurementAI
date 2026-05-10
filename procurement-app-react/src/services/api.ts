@@ -80,4 +80,24 @@ export const alertsApi = {
 export const companyApi = {
   get:    () => apiClient.get('/company'),
   upsert: (data: Record<string, unknown>) => apiClient.post('/company', data),
+  update: (data: Record<string, unknown>) => apiClient.put('/company', data),
+}
+
+// Matching / Winnability
+export const matchingApi = {
+  findMatches:    (limit = 50) => apiClient.post('/matching/find-matches', null, { params: { limit } }),
+  getMatches:     (params?: Record<string, unknown>) => apiClient.get('/matching/matches', { params }),
+  getSummary:     () => apiClient.get('/matching/matches/summary'),
+}
+
+// Company Documents
+export const documentsApi = {
+  list:   () => apiClient.get('/company/documents'),
+  upload: (file: File, doc_type: string) => {
+    const fd = new FormData()
+    fd.append('file', file)
+    fd.append('doc_type', doc_type)
+    return apiClient.post('/company/documents', fd, { headers: { 'Content-Type': 'multipart/form-data' } })
+  },
+  delete: (id: string) => apiClient.delete(`/company/documents/${id}`),
 }

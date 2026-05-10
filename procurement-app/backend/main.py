@@ -6,7 +6,7 @@ import os
 
 load_dotenv()
 
-from routers import auth, contracts, dashboard, alerts, company, eda, analytics, stats, barriers
+from routers import auth, contracts, dashboard, alerts, company, eda, analytics, stats, barriers, matching, documents
 from lib.alert_scheduler import check_and_send_alerts
 from apscheduler.schedulers.asyncio import AsyncIOScheduler
 
@@ -49,7 +49,9 @@ app.include_router(company.router, prefix="/company", tags=["company"])
 app.include_router(eda.router, prefix="/dashboard", tags=["eda"])
 app.include_router(analytics.router, prefix="/analytics", tags=["analytics"])
 app.include_router(stats.router,    prefix="/stats",     tags=["stats"])
-app.include_router(barriers.router, prefix="/barriers",  tags=["barriers"])
+app.include_router(barriers.router,  prefix="/barriers",  tags=["barriers"])
+app.include_router(matching.router,  prefix="/matching",  tags=["matching"])
+app.include_router(documents.router, prefix="/company/documents", tags=["documents"])
 
 
 @app.get("/")

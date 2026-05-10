@@ -11,10 +11,12 @@ const Onboarding          = lazy(() => import('../pages/Onboarding'))
 const Dashboard           = lazy(() => import('../pages/Dashboard'))
 const Contracts           = lazy(() => import('../pages/Contracts'))
 const Settings            = lazy(() => import('../pages/Settings'))
-const Analytics           = lazy(() => import('../pages/analytics/Analytics'))
-const BarrierAnalysis     = lazy(() => import('../pages/analytics/BarrierAnalysis'))
-const StatisticalAnalysis = lazy(() => import('../pages/analytics/StatisticalAnalysis'))
-const PredictiveModels    = lazy(() => import('../pages/analytics/PredictiveModels'))
+const Analytics              = lazy(() => import('../pages/analytics/Analytics'))
+const BarrierAnalysis        = lazy(() => import('../pages/analytics/BarrierAnalysis'))
+const StatisticalAnalysis    = lazy(() => import('../pages/analytics/StatisticalAnalysis'))
+const PredictiveModels       = lazy(() => import('../pages/analytics/PredictiveModels'))
+const EnhancedOnboarding     = lazy(() => import('../pages/EnhancedOnboarding'))
+const RecommendedContracts   = lazy(() => import('../pages/RecommendedContracts'))
 
 function ProtectedRoute({ children }: { children: React.ReactNode }) {
   const { isAuthenticated, loading } = useAuthStore()
@@ -40,10 +42,12 @@ export function AppRouter() {
 
         {/* Protected */}
         <Route element={<ProtectedRoute><LayoutWrapper /></ProtectedRoute>}>
-          <Route path="/onboarding" element={<Onboarding />} />
-          <Route path="/dashboard"  element={<Dashboard />} />
-          <Route path="/contracts"  element={<Contracts />} />
-          <Route path="/settings"   element={<Settings />} />
+          <Route path="/onboarding"       element={<Onboarding />} />
+          <Route path="/profile-setup"    element={<EnhancedOnboarding />} />
+          <Route path="/recommendations"  element={<RecommendedContracts />} />
+          <Route path="/dashboard"        element={<Dashboard />} />
+          <Route path="/contracts"        element={<Contracts />} />
+          <Route path="/settings"         element={<Settings />} />
 
           {/* Analytics */}
           <Route path="/analytics"                                  element={<Analytics />} />
