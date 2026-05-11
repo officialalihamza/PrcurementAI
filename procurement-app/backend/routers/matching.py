@@ -79,7 +79,12 @@ async def find_matches(
 
         # Replace old results for this company
         db.table("contract_matches").delete().eq("company_id", company["id"]).execute()
-        db.table("contract_matches").insert(rows).execute()
+        try:
+            db.table("contract_matches").insert(rows).execute()
+        except Exception:
+            # Fallback: insert without contract_snapshot if column doesn't exist yet
+            rows_slim = [{k: v for k, v in r.items() if k != "contract_snapshot"} for r in rows]
+            db.table("contract_matches").insert(rows_slim).execute()
 
         return {"matched": len(rows), "company_id": company["id"]}
     except HTTPException:
