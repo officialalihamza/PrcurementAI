@@ -11,6 +11,7 @@ import BusinessOutlinedIcon          from '@mui/icons-material/BusinessOutlined'
 import DeleteOutlinedIcon            from '@mui/icons-material/DeleteOutlined'
 import EditOutlinedIcon              from '@mui/icons-material/EditOutlined'
 import { alertsApi, companyApi }     from '../services/api'
+import { useCompanyStore }           from '../store/companyStore'
 import type { Alert as AlertType, Company } from '../types'
 
 // ── Alerts tab ────────────────────────────────────────────────────────────────
@@ -127,10 +128,17 @@ function AlertsTab() {
 // ── Company Profile tab ───────────────────────────────────────────────────────
 
 function CompanyProfileTab() {
-  const navigate = useNavigate()
+  const navigate    = useNavigate()
+  const setCompany  = useCompanyStore(s => s.setCompany)
+
   const { data, isLoading } = useQuery({
     queryKey: ['company'],
-    queryFn: async () => { const { data } = await companyApi.get(); return data.company as Company | null },
+    queryFn: async () => {
+      const { data } = await companyApi.get()
+      const co = data.company as Company | null
+      if (co) setCompany(co as unknown as Record<string, unknown>)
+      return co
+    },
   })
 
   if (isLoading) return <Typography sx={{ color: '#94a3b8', fontSize: 13 }}>Loading…</Typography>

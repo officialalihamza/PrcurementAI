@@ -61,3 +61,36 @@ export const useAnalyticsStats = (params?: Record<string, unknown>) =>
     },
     staleTime: 1000 * 60 * 10,
   })
+
+export const useRegionalSME = () =>
+  useQuery({
+    queryKey: ['sme-by-region'],
+    queryFn: async () => {
+      const { analyticsApi } = await import('../services/api')
+      const { data } = await analyticsApi.smeByRegion()
+      return (data.regions ?? []) as { region: string; sme_rate: number; contract_count: number }[]
+    },
+    staleTime: 1000 * 60 * 15,
+  })
+
+export const useSMETrend = (period = 'monthly') =>
+  useQuery({
+    queryKey: ['sme-trend', period],
+    queryFn: async () => {
+      const { analyticsApi } = await import('../services/api')
+      const { data } = await analyticsApi.smeTrend(period)
+      return (data.trend ?? []) as { month: string; sme_rate: number; total_contracts: number }[]
+    },
+    staleTime: 1000 * 60 * 15,
+  })
+
+export const useAnalyticsSummary = () =>
+  useQuery({
+    queryKey: ['analytics-summary'],
+    queryFn: async () => {
+      const { analyticsApi } = await import('../services/api')
+      const { data } = await analyticsApi.summary()
+      return data as { current_rate: number; growth_rate: number; target_rate: number }
+    },
+    staleTime: 1000 * 60 * 15,
+  })

@@ -160,12 +160,16 @@ export interface ContractSnapshot {
   buyer?: string
   sector?: string
   region?: string
-  value_low?: number
-  value_high?: number
+  value?: number
+  deadline?: string
   cpv_code?: string
   status?: string
   url?: string
   source?: string
+  strengths?: string[]
+  weaknesses?: string[]
+  recommendations?: string[]
+  risks?: string[]
 }
 
 export interface ContractMatch {

@@ -44,8 +44,11 @@ export const contractsApi = {
 
 // Analytics
 export const analyticsApi = {
-  getStats:  (params?: Record<string, unknown>) => apiClient.get('/analytics/stats', { params }),
-  getStatus: () => apiClient.get('/analytics/status'),
+  getStats:     (params?: Record<string, unknown>) => apiClient.get('/analytics/stats', { params }),
+  getStatus:    () => apiClient.get('/analytics/status'),
+  smeByRegion:  () => apiClient.get('/analytics/sme-by-region'),
+  smeTrend:     (period = 'monthly') => apiClient.get('/analytics/sme-trend', { params: { period } }),
+  summary:      () => apiClient.get('/analytics/summary'),
 }
 
 // Statistical Analysis
@@ -85,6 +88,8 @@ export const companyApi = {
 
 // Matching / Winnability
 export const matchingApi = {
+  score:          (company: Record<string, unknown>, contracts: unknown[]) =>
+                    apiClient.post('/matching/score', { company, contracts }),
   findMatches:    (limit = 50) => apiClient.post('/matching/find-matches', null, { params: { limit } }),
   getMatches:     (params?: Record<string, unknown>) => apiClient.get('/matching/matches', { params }),
   getSummary:     () => apiClient.get('/matching/matches/summary'),

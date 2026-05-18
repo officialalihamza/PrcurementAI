@@ -3,7 +3,7 @@ from typing import Optional, List
 
 
 class CompanyCreate(BaseModel):
-    name: str
+    name: Optional[str] = ""
     company_number: Optional[str] = None
     sic_codes: Optional[List[str]] = []
     postcode: Optional[str] = None

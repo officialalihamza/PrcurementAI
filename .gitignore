@@ -15,6 +15,8 @@ venv/
 # Node
 procurement-app/frontend/node_modules/
 procurement-app/frontend/dist/
+procurement-app-react/node_modules/
+procurement-app-react/dist/
 
 # Keep the pre-computed analytics cache
 !procurement-app/backend/analytics_cache.json

@@ -7,7 +7,8 @@ import {
 import { motion } from 'framer-motion'
 import { useNavigate } from 'react-router-dom'
 import { companyApi, documentsApi } from '../services/api'
-import { DocumentUpload } from '../components/company/DocumentUpload'
+import { DocumentUpload }           from '../components/company/DocumentUpload'
+import { useCompanyStore }          from '../store/companyStore'
 import type { Company, CompanyDocument } from '../types'
 
 const STEPS = ['Basic Info', 'Financial', 'Sectors & Geography', 'Experience & Certifications', 'Compliance & Docs']
@@ -57,7 +58,8 @@ const inputSx = {
 }
 
 export default function EnhancedOnboarding() {
-  const navigate = useNavigate()
+  const navigate   = useNavigate()
+  const setCompany = useCompanyStore(s => s.setCompany)
   const [step, setStep]       = useState(0)
   const [draft, setDraft]     = useState<DraftCompany>(emptyDraft)
   const [docs, setDocs]       = useState<CompanyDocument[]>([])
@@ -84,11 +86,10 @@ export default function EnhancedOnboarding() {
     setSaving(true)
     setError('')
     try {
-      await companyApi.upsert({
-        ...draft,
-        onboarding_step: nextStep,
-        onboarding_completed: completed,
-      })
+      const payload = { ...draft, onboarding_step: nextStep, onboarding_completed: completed }
+      await companyApi.upsert(payload)
+      // Keep Zustand store in sync so RecommendedContracts sees the latest profile
+      setCompany(payload as unknown as Record<string, unknown>)
     } catch (e: unknown) {
       setError((e as { response?: { data?: { detail?: string } } })?.response?.data?.detail || 'Save failed.')
     } finally {

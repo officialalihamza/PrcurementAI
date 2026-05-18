@@ -5,7 +5,9 @@
       "Read(//d/University/FYP/**)",
       "Read(//d/University/FYP/Extracted Data/**)",
       "Bash(python code/analysis/regression_analysis.py)",
-      "Bash(git add *)"
+      "Bash(git add *)",
+      "Bash(curl -s http://localhost:8000/debug)",
+      "Bash(python3 -c \"import sys,json; d=json.load\\(sys.stdin\\); print\\('origins:', d.get\\('allowed_origins'\\)\\)\")"
     ]
   }
 }

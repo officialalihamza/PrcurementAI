@@ -6,7 +6,7 @@ import os
 
 load_dotenv()
 
-from routers import auth, contracts, dashboard, alerts, company, eda, analytics, stats, barriers, matching, documents
+from routers import auth, contracts, dashboard, alerts, company, eda, analytics, debug, stats, barriers, matching, documents
 from lib.alert_scheduler import check_and_send_alerts
 from apscheduler.schedulers.asyncio import AsyncIOScheduler
 
@@ -36,7 +36,7 @@ origins = [o.strip() for o in _raw_origins.split(",") if o.strip()] if _raw_orig
 app.add_middleware(
     CORSMiddleware,
     allow_origins=origins,
-    allow_credentials=False,   # app uses Bearer tokens, not cookies — wildcard + credentials is invalid
+    allow_credentials=False,
     allow_methods=["*"],
     allow_headers=["*"],
 )
@@ -48,10 +48,11 @@ app.include_router(alerts.router, prefix="/alerts", tags=["alerts"])
 app.include_router(company.router, prefix="/company", tags=["company"])
 app.include_router(eda.router, prefix="/dashboard", tags=["eda"])
 app.include_router(analytics.router, prefix="/analytics", tags=["analytics"])
-app.include_router(stats.router,    prefix="/stats",     tags=["stats"])
-app.include_router(barriers.router,  prefix="/barriers",  tags=["barriers"])
-app.include_router(matching.router,  prefix="/matching",  tags=["matching"])
+app.include_router(stats.router, prefix="/stats", tags=["stats"])
+app.include_router(barriers.router, prefix="/barriers", tags=["barriers"])
+app.include_router(matching.router, prefix="/matching", tags=["matching"])
 app.include_router(documents.router, prefix="/company/documents", tags=["documents"])
+app.include_router(debug.router, prefix="/api/debug", tags=["debug"])
 
 
 @app.get("/")
@@ -82,7 +83,7 @@ async def trigger_alerts_now():
 
 
 @app.get("/debug")
-def debug():
+def debug_status():
     import base64, json as _json
     import lib.ocds_fetcher as fetcher
     from lib.supabase import supabase as _sb
@@ -113,7 +114,7 @@ def debug():
         "allowed_origins": os.getenv("ALLOWED_ORIGINS", "*"),
         "supabase_url_set": bool(os.getenv("SUPABASE_URL")),
         "supabase_key_set": bool(key),
-        "supabase_key_role": key_role,   # should be "service_role" not "anon"
+        "supabase_key_role": key_role,
         "supabase_db_read_ok": db_read_ok,
         "supabase_db_read_error": db_read_error,
         "analytics_cache_records": cache.get("record_count", 0),

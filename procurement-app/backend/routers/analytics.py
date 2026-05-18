@@ -91,6 +91,230 @@ def get_status(current_user: dict = Depends(get_current_user)):
     }
 
 
+# ── Region normalization ────────────────────────────────────────────────────
+
+_REGION_CANONICAL = {
+    "london": "London",
+    "south east": "South East",
+    "south west": "South West",
+    "east of england": "East of England",
+    "east midlands": "East Midlands",
+    "west midlands": "West Midlands",
+    "yorkshire and the humber": "Yorkshire & The Humber",
+    "yorkshire and humber": "Yorkshire & The Humber",
+    "north west": "North West",
+    "north east": "North East",
+    "scotland": "Scotland",
+    "wales": "Wales",
+    "northern ireland": "Northern Ireland",
+}
+
+_CITY_TO_REGION = {
+    # London boroughs
+    "westminster": "London", "stratford": "London", "croydon": "London",
+    "morden": "London", "hackney": "London", "islington": "London",
+    "camden": "London", "greenwich": "London", "brent": "London",
+    "lambeth": "London", "southwark": "London", "tower hamlets": "London",
+    "wandsworth": "London", "lewisham": "London", "haringey": "London",
+    "hammersmith": "London", "ealing": "London", "barnet": "London",
+    "enfield": "London", "hounslow": "London", "newham": "London",
+    "redbridge": "London", "waltham forest": "London", "havering": "London",
+    "bromley": "London", "kingston": "London", "merton": "London",
+    "sutton": "London", "richmond": "London", "hillingdon": "London",
+    "harrow": "London", "bexley": "London",
+    # South East
+    "lewes": "South East", "brighton": "South East", "oxford": "South East",
+    "reading": "South East", "southampton": "South East", "portsmouth": "South East",
+    "winchester": "South East", "guildford": "South East", "maidstone": "South East",
+    "canterbury": "South East", "folkestone": "South East", "hastings": "South East",
+    "eastbourne": "South East", "worthing": "South East", "crawley": "South East",
+    "basingstoke": "South East", "slough": "South East", "bedford": "South East",
+    # North West
+    "manchester": "North West", "liverpool": "North West", "preston": "North West",
+    "salford": "North West", "bolton": "North West", "wigan": "North West",
+    "blackburn": "North West", "blackpool": "North West", "burnley": "North West",
+    "chester": "North West", "warrington": "North West", "carlisle": "North West",
+    "lancaster": "North West", "oldham": "North West", "rochdale": "North West",
+    "stockport": "North West",
+    # Yorkshire
+    "leeds": "Yorkshire & The Humber", "sheffield": "Yorkshire & The Humber",
+    "bradford": "Yorkshire & The Humber", "hull": "Yorkshire & The Humber",
+    "york": "Yorkshire & The Humber", "huddersfield": "Yorkshire & The Humber",
+    "wakefield": "Yorkshire & The Humber", "doncaster": "Yorkshire & The Humber",
+    "rotherham": "Yorkshire & The Humber", "barnsley": "Yorkshire & The Humber",
+    "halifax": "Yorkshire & The Humber",
+    # West Midlands
+    "birmingham": "West Midlands", "coventry": "West Midlands",
+    "wolverhampton": "West Midlands", "walsall": "West Midlands",
+    "dudley": "West Midlands", "sandwell": "West Midlands",
+    "solihull": "West Midlands", "stoke": "West Midlands",
+    # East Midlands
+    "nottingham": "East Midlands", "leicester": "East Midlands",
+    "derby": "East Midlands", "lincoln": "East Midlands",
+    "northampton": "East Midlands", "burton upon trent": "East Midlands",
+    "burton-on-trent": "East Midlands", "chesterfield": "East Midlands",
+    "mansfield": "East Midlands",
+    # East of England
+    "norwich": "East of England", "cambridge": "East of England",
+    "ipswich": "East of England", "luton": "East of England",
+    "peterborough": "East of England", "chelmsford": "East of England",
+    "colchester": "East of England", "stevenage": "East of England",
+    # North East
+    "newcastle": "North East", "sunderland": "North East",
+    "gateshead": "North East", "durham": "North East",
+    "darlington": "North East", "hartlepool": "North East",
+    "stockton": "North East", "middlesbrough": "North East",
+    # South West
+    "bristol": "South West", "plymouth": "South West",
+    "exeter": "South West", "truro": "South West",
+    "bath": "South West", "bournemouth": "South West",
+    "swindon": "South West", "gloucester": "South West",
+    "cheltenham": "South West", "taunton": "South West", "poole": "South West",
+    # Scotland
+    "edinburgh": "Scotland", "glasgow": "Scotland",
+    "aberdeen": "Scotland", "dundee": "Scotland",
+    "inverness": "Scotland", "perth": "Scotland",
+    # Wales
+    "cardiff": "Wales", "swansea": "Wales",
+    "newport": "Wales", "wrexham": "Wales",
+    # Northern Ireland
+    "belfast": "Northern Ireland", "londonderry": "Northern Ireland",
+    "derry": "Northern Ireland",
+}
+
+
+def _normalize_region(raw: str) -> str:
+    if not raw:
+        return ""
+    s = raw.lower().strip()
+    if s in _REGION_CANONICAL:
+        return _REGION_CANONICAL[s]
+    for key, val in _REGION_CANONICAL.items():
+        if key in s:
+            return val
+    for city, region in _CITY_TO_REGION.items():
+        if city in s:
+            return region
+    return ""
+
+
+# ── New dedicated analytics endpoints ───────────────────────────────────────
+
+@router.get("/sme-by-region")
+def get_sme_by_region(current_user: dict = Depends(get_current_user)):
+    """SME award rate by standard UK region, sorted descending."""
+    try:
+        stats = fetcher.get_stats()
+        raw_regions = stats.get("sme_by_region", [])
+
+        region_totals: dict = {}
+        for row in raw_regions:
+            normalized = _normalize_region(row.get("region", ""))
+            if not normalized:
+                continue
+            n = row.get("n", 0)
+            if not n:
+                continue
+            sme_n = round(row["sme_rate"] / 100 * n)
+            if normalized not in region_totals:
+                region_totals[normalized] = {"sme_n": 0, "total_n": 0}
+            region_totals[normalized]["sme_n"]   += sme_n
+            region_totals[normalized]["total_n"] += n
+
+        result = []
+        for region, counts in region_totals.items():
+            if counts["total_n"] >= 50:
+                rate = round(counts["sme_n"] / counts["total_n"] * 100, 1)
+                result.append({
+                    "region": region,
+                    "sme_rate": rate,
+                    "contract_count": counts["total_n"],
+                })
+
+        # Fall back to raw data if normalization yields too few regions
+        if len(result) < 4:
+            from lib.ocds_fetcher import FALLBACK_STATS
+            result = [
+                {
+                    "region": r["region"],
+                    "sme_rate": r["sme_rate"],
+                    "contract_count": r.get("n", 0),
+                }
+                for r in FALLBACK_STATS["sme_by_region"]
+            ]
+
+        result.sort(key=lambda x: x["sme_rate"], reverse=True)
+        return {"regions": result}
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=str(e))
+
+
+@router.get("/sme-trend")
+def get_sme_trend(
+    period: str = "monthly",
+    current_user: dict = Depends(get_current_user),
+):
+    """SME rate trend. Monthly interpolates from annual data."""
+    try:
+        stats    = fetcher.get_stats()
+        by_year  = sorted(stats.get("sme_by_year", []), key=lambda x: x["year"])
+
+        if not by_year:
+            raise HTTPException(status_code=404, detail="No trend data available")
+
+        months = ["Jan", "Feb", "Mar", "Apr", "May", "Jun",
+                  "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"]
+
+        if period == "monthly":
+            recent = by_year[-3:] if len(by_year) >= 3 else by_year
+            result = []
+            for i, yr_data in enumerate(recent):
+                yr         = yr_data["year"]
+                rate_start = yr_data["sme_rate"]
+                rate_end   = recent[i + 1]["sme_rate"] if i + 1 < len(recent) else rate_start
+                for m in range(12):
+                    frac  = m / 12
+                    rate  = round(rate_start + (rate_end - rate_start) * frac, 1)
+                    label = f"{months[m]} {str(yr)[2:]}"
+                    result.append({
+                        "month":           label,
+                        "sme_rate":        rate,
+                        "total_contracts": (yr_data.get("total", 0) or 0) // 12,
+                    })
+            return {"trend": result}
+
+        # yearly fallback
+        return {
+            "trend": [
+                {
+                    "month":           str(y["year"]),
+                    "sme_rate":        y["sme_rate"],
+                    "total_contracts": y.get("total", 0),
+                }
+                for y in by_year
+            ]
+        }
+    except HTTPException:
+        raise
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=str(e))
+
+
+@router.get("/summary")
+def get_analytics_summary(current_user: dict = Depends(get_current_user)):
+    """Return current SME rate, growth, and 2028 target."""
+    try:
+        stats    = fetcher.get_stats()
+        by_year  = sorted(stats.get("sme_by_year", []), key=lambda x: x["year"])
+        current  = stats.get("national_avg_sme_rate", 41.4)
+        first_r  = by_year[0]["sme_rate"]  if by_year else current
+        latest_r = by_year[-1]["sme_rate"] if by_year else current
+        growth   = round(((latest_r - first_r) / first_r) * 100, 1) if first_r else 0
+        return {"current_rate": current, "growth_rate": growth, "target_rate": 50.0}
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=str(e))
+
+
 @router.post("/refresh")
 def trigger_refresh(
     background_tasks: BackgroundTasks,

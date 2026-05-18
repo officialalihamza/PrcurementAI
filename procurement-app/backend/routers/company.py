@@ -23,16 +23,9 @@ def upsert_company(body: CompanyCreate, current_user: dict = Depends(get_current
         db = get_user_client(current_user["token"])
         existing = db.table("companies").select("id").eq("user_id", current_user["user_id"]).execute()
 
-        data = {
-            "user_id": current_user["user_id"],
-            "name": body.name,
-            "company_number": body.company_number,
-            "sic_codes": body.sic_codes or [],
-            "postcode": body.postcode,
-            "region": body.region,
-            "employees": body.employees,
-            "turnover": body.turnover,
-        }
+        data = {k: v for k, v in body.model_dump().items() if v is not None}
+        data["user_id"] = current_user["user_id"]
+        data.setdefault("name", "")
 
         if existing.data:
             db.table("companies").update(data).eq("user_id", current_user["user_id"]).execute()

@@ -6,6 +6,65 @@ from lib.winnability_engine import score_contract
 router = APIRouter()
 
 
+@router.post("/score")
+async def score_contracts(
+    body: dict,
+    current_user: dict = Depends(get_current_user),
+):
+    """
+    Stateless scoring — no DB reads or writes.
+    Accepts { company: {...}, contracts: [...] } sent directly from the frontend.
+    Returns contracts ranked by winnability score.
+    """
+    try:
+        company   = body.get("company") or {}
+        contracts = body.get("contracts") or []
+
+        if not contracts:
+            return {"matches": [], "total": 0}
+
+        results = []
+        for c in contracts:
+            s = score_contract(company, c)
+            results.append({
+                "contract": {
+                    "id":          c.get("id") or c.get("ocid") or "",
+                    "ocid":        c.get("ocid") or "",
+                    "title":       c.get("title"),
+                    "buyer":       c.get("buyer"),
+                    "sector":      c.get("sector"),
+                    "region":      c.get("region"),
+                    "value":       c.get("value"),
+                    "deadline":    c.get("deadline"),
+                    "published":   c.get("published"),
+                    "cpv_code":    c.get("cpv_code"),
+                    "status":      c.get("status"),
+                    "url":         c.get("url"),
+                    "source":      c.get("source"),
+                    "sme_suitable": c.get("sme_suitable"),
+                },
+                "total_score":              s["total_score"],
+                "recommendation":           s["recommendation"],
+                "sector_match_score":       s["sector_match"],
+                "financial_health_score":   s["financial_health"],
+                "size_fit_score":           s["size_fit"],
+                "geographic_fit_score":     s["geographic_fit"],
+                "capability_score":         s["capability"],
+                "experience_score":         s["experience"],
+                "timeline_capacity_score":  s["timeline_capacity"],
+                "compliance_score":         s["compliance"],
+                "strengths":               s.get("strengths", []),
+                "weaknesses":              s.get("weaknesses", []),
+                "recommendations":         s.get("recommendations", []),
+                "risks":                   s.get("risks", []),
+            })
+
+        results.sort(key=lambda x: x["total_score"], reverse=True)
+        return {"matches": results, "total": len(results)}
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=str(e))
+
+
 def _get_company(db, user_id: str) -> dict:
     res = db.table("companies").select("*").eq("user_id", user_id).execute()
     if not res.data:
@@ -64,16 +123,20 @@ async def find_matches(
                 "compliance_score":         s["compliance"],
                 "recommendation":           s["recommendation"],
                 "contract_snapshot": {
-                    "title":      c.get("title"),
-                    "buyer":      c.get("buyer"),
-                    "sector":     c.get("sector"),
-                    "region":     c.get("region"),
-                    "value_low":  c.get("value_low"),
-                    "value_high": c.get("value_high"),
-                    "cpv_code":   c.get("cpv_code"),
-                    "status":     c.get("status"),
-                    "url":        c.get("url"),
-                    "source":     c.get("source"),
+                    "title":           c.get("title"),
+                    "buyer":           c.get("buyer"),
+                    "sector":          c.get("sector"),
+                    "region":          c.get("region"),
+                    "value":           c.get("value"),
+                    "deadline":        c.get("deadline"),
+                    "cpv_code":        c.get("cpv_code"),
+                    "status":          c.get("status"),
+                    "url":             c.get("url"),
+                    "source":          c.get("source"),
+                    "strengths":       s.get("strengths", []),
+                    "weaknesses":      s.get("weaknesses", []),
+                    "recommendations": s.get("recommendations", []),
+                    "risks":           s.get("risks", []),
                 },
             })
 

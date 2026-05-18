@@ -1,240 +1,288 @@
 import { useState } from 'react'
 import {
   Drawer, List, ListItemButton, ListItemIcon,
-  Collapse, Box, Typography, Divider,
+  Box, Typography, Divider, Tooltip, IconButton,
 } from '@mui/material'
-import DashboardOutlinedIcon       from '@mui/icons-material/DashboardOutlined'
+import DashboardOutlinedIcon        from '@mui/icons-material/DashboardOutlined'
 import SearchOutlinedIcon           from '@mui/icons-material/SearchOutlined'
-import BarChartOutlinedIcon         from '@mui/icons-material/BarChartOutlined'
-import QueryStatsOutlinedIcon       from '@mui/icons-material/QueryStatsOutlined'
-import BlockOutlinedIcon            from '@mui/icons-material/BlockOutlined'
-import DonutSmallOutlinedIcon       from '@mui/icons-material/DonutSmallOutlined'
-import AccountBalanceOutlinedIcon   from '@mui/icons-material/AccountBalanceOutlined'
-import TrendingUpOutlinedIcon       from '@mui/icons-material/TrendingUpOutlined'
-import TrackChangesOutlinedIcon     from '@mui/icons-material/TrackChangesOutlined'
-import FindInPageOutlinedIcon       from '@mui/icons-material/FindInPageOutlined'
-import ShowChartOutlinedIcon        from '@mui/icons-material/ShowChartOutlined'
+import AutoAwesomeOutlinedIcon      from '@mui/icons-material/AutoAwesomeOutlined'
+import BuildOutlinedIcon            from '@mui/icons-material/BuildOutlined'
 import SettingsOutlinedIcon         from '@mui/icons-material/SettingsOutlined'
+import TrendingUpOutlinedIcon       from '@mui/icons-material/TrendingUpOutlined'
 import ExpandLessIcon               from '@mui/icons-material/ExpandLess'
 import ExpandMoreIcon               from '@mui/icons-material/ExpandMore'
-import AutoAwesomeOutlinedIcon      from '@mui/icons-material/AutoAwesomeOutlined'
-import BusinessOutlinedIcon         from '@mui/icons-material/BusinessOutlined'
+import ChevronLeftIcon              from '@mui/icons-material/ChevronLeft'
+import ChevronRightIcon             from '@mui/icons-material/ChevronRight'
 import { useLocation, useNavigate } from 'react-router-dom'
 import { motion, AnimatePresence }  from 'framer-motion'
+import { SIDEBAR_W, SIDEBAR_W_COL } from './LayoutWrapper'
 
-const DRAWER_WIDTH = 252
+const BG = '#0f1f35'
 
-// ── Section definitions ───────────────────────────────────────────────────────
+// ── Nav data ──────────────────────────────────────────────────────────────────
 
-const MAIN_ITEMS = [
-  { label: 'Dashboard',        path: '/dashboard',       Icon: DashboardOutlinedIcon },
-  { label: 'Contracts',        path: '/contracts',        Icon: SearchOutlinedIcon },
-  { label: 'Recommended',      path: '/recommendations',  Icon: AutoAwesomeOutlinedIcon },
-  { label: 'Company Profile',  path: '/profile-setup',    Icon: BusinessOutlinedIcon },
+const DASHBOARD_SUB = [
+  { label: 'Overview',             path: '/dashboard' },
+  { label: 'Market Overview',      path: '/analytics' },
+  { label: 'Statistical Analysis', path: '/analytics/stats' },
+  { label: 'Barrier Analysis',     path: '/analytics/barriers' },
+  { label: 'Sector Profiles',      path: '/analytics/barriers/sector-profiles' },
+  { label: 'Institutional',        path: '/analytics/barriers/institutional' },
 ]
 
-const ANALYTICS_SUB = [
-  { label: 'Market Overview',      path: '/analytics',                              Icon: BarChartOutlinedIcon },
-  { label: 'Statistical Analysis', path: '/analytics/stats',                        Icon: QueryStatsOutlinedIcon },
-  { label: 'Barrier Analysis',     path: '/analytics/barriers',                     Icon: BlockOutlinedIcon },
-  { label: 'Sector Profiles',      path: '/analytics/barriers/sector-profiles',     Icon: DonutSmallOutlinedIcon },
-  { label: 'Institutional',        path: '/analytics/barriers/institutional',       Icon: AccountBalanceOutlinedIcon },
+const TOOL_SUB = [
+  { label: 'Winnability',       path: '/winnability' },
+  { label: 'Language Detector', path: '/language-detector' },
+  { label: 'Forecasting',       path: '/analytics/predictive' },
 ]
 
-const TOOL_ITEMS = [
-  { label: 'Winnability',       path: '/winnability',        Icon: TrackChangesOutlinedIcon },
-  { label: 'Language Detector', path: '/language-detector',  Icon: FindInPageOutlinedIcon },
-  { label: 'Forecasting',       path: '/analytics/predictive', Icon: ShowChartOutlinedIcon },
+const SETTINGS_SUB = [
+  { label: 'Company Profile', path: '/profile-setup' },
+  { label: 'Alerts',          path: '/settings' },
 ]
 
-// ── Style helpers ─────────────────────────────────────────────────────────────
+// ── Expanded: parent item ─────────────────────────────────────────────────────
 
-const itemSx = (active: boolean) => ({
-  borderRadius: 1.5,
-  py: 0.875, px: 1.5,
-  mb: 0.25,
-  mx: 1,
-  color: active ? '#fff' : 'rgba(255,255,255,0.65)',
-  bgcolor: active ? 'rgba(147,197,253,0.15)' : 'transparent',
-  borderLeft: active ? '3px solid #60a5fa' : '3px solid transparent',
-  '& .MuiListItemIcon-root': { color: active ? '#60a5fa' : 'rgba(255,255,255,0.45)' },
-  '&:hover': {
-    bgcolor: 'rgba(255,255,255,0.07)',
-    color: '#fff',
-    '& .MuiListItemIcon-root': { color: 'rgba(255,255,255,0.8)' },
-  },
-  transition: 'all 0.15s',
-})
-
-const subItemSx = (active: boolean) => ({
-  borderRadius: 1.5,
-  py: 0.75, px: 1.5,
-  mb: 0.25,
-  color: active ? '#fff' : 'rgba(255,255,255,0.6)',
-  bgcolor: active ? 'rgba(147,197,253,0.15)' : 'transparent',
-  borderLeft: active ? '3px solid #60a5fa' : '3px solid transparent',
-  '& .MuiListItemIcon-root': { color: active ? '#60a5fa' : 'rgba(255,255,255,0.35)' },
-  '&:hover': {
-    bgcolor: 'rgba(255,255,255,0.07)',
-    color: '#fff',
-    '& .MuiListItemIcon-root': { color: 'rgba(255,255,255,0.7)' },
-  },
-  transition: 'all 0.15s',
-})
-
-function SectionLabel({ children }: { children: React.ReactNode }) {
-  return (
-    <Box sx={{ px: 2.5, pt: 2, pb: 0.5 }}>
-      <Typography sx={{
-        fontSize: 10, fontWeight: 700, letterSpacing: '0.1em',
-        textTransform: 'uppercase', color: 'rgba(255,255,255,0.28)',
-      }}>
-        {children}
-      </Typography>
-    </Box>
-  )
+interface ParentProps {
+  label: string
+  Icon: React.ElementType
+  active?: boolean
+  expanded?: boolean
+  hasChildren?: boolean
+  onClick: () => void
 }
 
-function NavItem({ label, path, Icon, active, onClick }: {
-  label: string; path: string; Icon: React.ElementType
-  active: boolean; onClick: () => void
-}) {
+function ParentItem({ label, Icon, active = false, expanded = false, hasChildren = false, onClick }: ParentProps) {
   return (
-    <ListItemButton onClick={onClick} sx={itemSx(active)}>
-      <ListItemIcon sx={{ minWidth: 34 }}>
+    <ListItemButton onClick={onClick} sx={{
+      py: 1.125, px: 2,
+      bgcolor: (active || expanded) ? 'rgba(96,165,250,0.12)' : 'transparent',
+      borderBottom: '1px solid rgba(255,255,255,0.04)',
+      '&:hover': { bgcolor: 'rgba(255,255,255,0.07)' },
+      transition: 'background 0.15s',
+    }}>
+      <ListItemIcon sx={{ minWidth: 36, color: active ? '#60a5fa' : 'rgba(255,255,255,0.55)' }}>
         <Icon sx={{ fontSize: 18 }} />
       </ListItemIcon>
-      <Typography sx={{ fontSize: 13, fontWeight: active ? 600 : 400, color: 'inherit', lineHeight: 1 }}>
+      <Typography sx={{
+        fontSize: 13, fontWeight: 600, flex: 1, lineHeight: 1,
+        color: active ? '#fff' : 'rgba(255,255,255,0.85)',
+      }}>
+        {label}
+      </Typography>
+      {hasChildren && (
+        expanded
+          ? <ExpandLessIcon sx={{ fontSize: 16, color: 'rgba(255,255,255,0.4)' }} />
+          : <ExpandMoreIcon sx={{ fontSize: 16, color: 'rgba(255,255,255,0.4)' }} />
+      )}
+    </ListItemButton>
+  )
+}
+
+// ── Expanded: sub-item ────────────────────────────────────────────────────────
+
+function SubItem({ label, active, onClick }: { label: string; active: boolean; onClick: () => void }) {
+  return (
+    <ListItemButton onClick={onClick} sx={{
+      py: 0.875, pl: '44px', pr: 2,
+      bgcolor: active ? 'rgba(96,165,250,0.14)' : 'transparent',
+      borderBottom: '1px solid rgba(255,255,255,0.02)',
+      '&:hover': { bgcolor: 'rgba(255,255,255,0.06)' },
+      transition: 'background 0.15s',
+    }}>
+      <Box component="span" sx={{
+        mr: 1.5, fontSize: 20, lineHeight: '14px',
+        color: active ? '#60a5fa' : 'rgba(255,255,255,0.3)',
+      }}>•</Box>
+      <Typography sx={{
+        fontSize: 12.5, fontWeight: active ? 600 : 400, lineHeight: 1,
+        color: active ? '#fff' : 'rgba(255,255,255,0.65)',
+      }}>
         {label}
       </Typography>
     </ListItemButton>
   )
 }
 
-function SubNavItem({ label, path, Icon, active, onClick }: {
-  label: string; path: string; Icon: React.ElementType
-  active: boolean; onClick: () => void
+// ── Collapsed: icon-only item ─────────────────────────────────────────────────
+
+function CollapsedItem({ label, Icon, active, onClick }: {
+  label: string; Icon: React.ElementType; active: boolean; onClick: () => void
 }) {
   return (
-    <ListItemButton onClick={onClick} sx={subItemSx(active)}>
-      <ListItemIcon sx={{ minWidth: 30 }}>
-        <Icon sx={{ fontSize: 15 }} />
-      </ListItemIcon>
-      <Typography sx={{ fontSize: 12, fontWeight: active ? 600 : 400, color: 'inherit', lineHeight: 1 }}>
-        {label}
-      </Typography>
-    </ListItemButton>
+    <Tooltip title={label} placement="right" arrow>
+      <ListItemButton onClick={onClick} sx={{
+        py: 1.25, px: 0, justifyContent: 'center',
+        bgcolor: active ? 'rgba(96,165,250,0.14)' : 'transparent',
+        borderBottom: '1px solid rgba(255,255,255,0.04)',
+        '&:hover': { bgcolor: 'rgba(255,255,255,0.07)' },
+        transition: 'background 0.15s',
+      }}>
+        <Icon sx={{ fontSize: 20, color: active ? '#60a5fa' : 'rgba(255,255,255,0.55)' }} />
+      </ListItemButton>
+    </Tooltip>
+  )
+}
+
+// ── Collapsible group (animated) ──────────────────────────────────────────────
+
+function CollapseGroup({ open, children }: { open: boolean; children: React.ReactNode }) {
+  return (
+    <AnimatePresence>
+      {open && (
+        <motion.div
+          initial={{ height: 0, opacity: 0 }}
+          animate={{ height: 'auto', opacity: 1 }}
+          exit={{ height: 0, opacity: 0 }}
+          transition={{ duration: 0.2 }}
+          style={{ overflow: 'hidden' }}
+        >
+          <Box sx={{ bgcolor: 'rgba(0,0,0,0.12)' }}>{children}</Box>
+        </motion.div>
+      )}
+    </AnimatePresence>
   )
 }
 
 // ── Sidebar ───────────────────────────────────────────────────────────────────
 
-interface Props { mobileOpen: boolean; onClose: () => void }
+interface Props {
+  mobileOpen: boolean
+  onClose: () => void
+  collapsed: boolean
+  onToggle: () => void
+}
 
-export function Sidebar({ mobileOpen, onClose }: Props) {
-  const location  = useLocation()
+export function Sidebar({ mobileOpen, onClose, collapsed, onToggle }: Props) {
+  const location = useLocation()
   const navigate  = useNavigate()
-  const [analyticsOpen, setAnalyticsOpen] = useState(location.pathname.startsWith('/analytics'))
 
-  const isActive  = (path: string) => location.pathname === path
-  const nav       = (path: string) => { navigate(path); onClose() }
+  const isDashRoute   = location.pathname === '/dashboard' || location.pathname.startsWith('/analytics')
+  const isToolRoute   = TOOL_SUB.some(t => location.pathname === t.path)
+  const isSettingRoute= location.pathname === '/settings'  || location.pathname === '/profile-setup'
 
-  const sidebarContent = (
-    <Box sx={{ height: '100%', display: 'flex', flexDirection: 'column', bgcolor: '#0f1f35' }}>
+  const [dashOpen,    setDashOpen]    = useState(isDashRoute)
+  const [toolOpen,    setToolOpen]    = useState(isToolRoute)
+  const [settOpen,    setSettOpen]    = useState(isSettingRoute)
 
-      {/* Logo */}
-      <Box sx={{ px: 2.5, py: 2.5, borderBottom: '1px solid rgba(255,255,255,0.07)' }}>
+  const isActive = (p: string) => location.pathname === p
+  const nav = (p: string) => { navigate(p); onClose() }
+
+  // ── Collapsed view ──────────────────────────────────────────────────────────
+  const collapsedContent = (
+    <Box sx={{ height: '100%', display: 'flex', flexDirection: 'column', bgcolor: BG, alignItems: 'center' }}>
+      {/* Logo icon */}
+      <Box sx={{ py: 1.75, borderBottom: '1px solid rgba(255,255,255,0.07)', width: '100%', display: 'flex', justifyContent: 'center' }}>
+        <Box sx={{
+          width: 34, height: 34, borderRadius: 2, flexShrink: 0,
+          background: 'linear-gradient(135deg, #2563eb 0%, #1d4ed8 100%)',
+          display: 'flex', alignItems: 'center', justifyContent: 'center',
+          boxShadow: '0 4px 12px rgba(37,99,235,0.4)',
+        }}>
+          <TrendingUpOutlinedIcon sx={{ color: '#fff', fontSize: 18 }} />
+        </Box>
+      </Box>
+
+      {/* Icon nav */}
+      <Box sx={{ flex: 1, width: '100%', overflowY: 'auto', '&::-webkit-scrollbar': { display: 'none' } }}>
+        <List dense disablePadding>
+          <CollapsedItem label="Analytical Dashboard" Icon={DashboardOutlinedIcon} active={isDashRoute && !isToolRoute} onClick={() => nav('/dashboard')} />
+          <CollapsedItem label="Contracts"  Icon={SearchOutlinedIcon}        active={isActive('/contracts')}      onClick={() => nav('/contracts')} />
+          <CollapsedItem label="AI Matches" Icon={AutoAwesomeOutlinedIcon}   active={isActive('/recommendations')} onClick={() => nav('/recommendations')} />
+          <CollapsedItem label="Tools"      Icon={BuildOutlinedIcon}         active={isToolRoute}                 onClick={() => nav('/winnability')} />
+          <Divider sx={{ my: 0.75, borderColor: 'rgba(255,255,255,0.07)' }} />
+          <CollapsedItem label="Settings"   Icon={SettingsOutlinedIcon}      active={isSettingRoute}              onClick={() => nav('/settings')} />
+        </List>
+      </Box>
+
+      {/* Expand toggle */}
+      <Box sx={{ py: 1.5, borderTop: '1px solid rgba(255,255,255,0.07)', width: '100%', display: 'flex', justifyContent: 'center' }}>
+        <Tooltip title="Expand sidebar" placement="right">
+          <IconButton onClick={onToggle} size="small" sx={{ color: 'rgba(255,255,255,0.4)', '&:hover': { color: '#fff', bgcolor: 'rgba(255,255,255,0.08)' } }}>
+            <ChevronRightIcon sx={{ fontSize: 18 }} />
+          </IconButton>
+        </Tooltip>
+      </Box>
+    </Box>
+  )
+
+  // ── Expanded view ───────────────────────────────────────────────────────────
+  const expandedContent = (
+    <Box sx={{ height: '100%', display: 'flex', flexDirection: 'column', bgcolor: BG }}>
+
+      {/* Logo row */}
+      <Box sx={{ px: 2.5, py: 2.25, borderBottom: '1px solid rgba(255,255,255,0.07)', display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
         <Box sx={{ display: 'flex', alignItems: 'center', gap: 1.5 }}>
           <Box sx={{
-            width: 36, height: 36, borderRadius: 2,
+            width: 36, height: 36, borderRadius: 2, flexShrink: 0,
             background: 'linear-gradient(135deg, #2563eb 0%, #1d4ed8 100%)',
-            display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0,
+            display: 'flex', alignItems: 'center', justifyContent: 'center',
             boxShadow: '0 4px 12px rgba(37,99,235,0.4)',
           }}>
             <TrendingUpOutlinedIcon sx={{ color: '#fff', fontSize: 18 }} />
           </Box>
           <Box>
-            <Typography sx={{ color: '#fff', fontWeight: 700, fontSize: 14, lineHeight: 1.2 }}>
-              ProcurementAI
-            </Typography>
-            <Typography sx={{ color: 'rgba(255,255,255,0.35)', fontSize: 10, lineHeight: 1 }}>
-              UK Contract Intelligence
-            </Typography>
+            <Typography sx={{ color: '#fff', fontWeight: 700, fontSize: 14, lineHeight: 1.2 }}>ProcurementAI</Typography>
+            <Typography sx={{ color: 'rgba(255,255,255,0.35)', fontSize: 10, lineHeight: 1 }}>UK Contract Intelligence</Typography>
           </Box>
         </Box>
+
+        {/* Collapse toggle */}
+        <Tooltip title="Collapse sidebar" placement="right">
+          <IconButton onClick={onToggle} size="small" sx={{ color: 'rgba(255,255,255,0.35)', '&:hover': { color: '#fff', bgcolor: 'rgba(255,255,255,0.08)' } }}>
+            <ChevronLeftIcon sx={{ fontSize: 18 }} />
+          </IconButton>
+        </Tooltip>
       </Box>
 
       {/* Nav */}
-      <Box sx={{ flex: 1, overflowY: 'auto', py: 1,
+      <Box sx={{
+        flex: 1, overflowY: 'auto',
         '&::-webkit-scrollbar': { width: 4 },
         '&::-webkit-scrollbar-track': { bgcolor: 'transparent' },
         '&::-webkit-scrollbar-thumb': { bgcolor: 'rgba(255,255,255,0.1)', borderRadius: 2 },
       }}>
         <List dense disablePadding>
 
-          {/* Main */}
-          <SectionLabel>Main</SectionLabel>
-          {MAIN_ITEMS.map(({ label, path, Icon }) => (
-            <NavItem key={path} label={label} path={path} Icon={Icon}
-              active={isActive(path)} onClick={() => nav(path)} />
-          ))}
+          {/* Analytical Dashboard */}
+          <ParentItem label="Analytical Dashboard" Icon={DashboardOutlinedIcon}
+            active={isDashRoute && !isToolRoute} expanded={dashOpen} hasChildren
+            onClick={() => setDashOpen(o => !o)} />
+          <CollapseGroup open={dashOpen}>
+            {DASHBOARD_SUB.map(({ label, path }) => (
+              <SubItem key={path} label={label} active={isActive(path)} onClick={() => nav(path)} />
+            ))}
+          </CollapseGroup>
 
-          {/* Analytics */}
-          <SectionLabel>Analytics</SectionLabel>
+          {/* Contracts */}
+          <ParentItem label="Contracts" Icon={SearchOutlinedIcon}
+            active={isActive('/contracts')} onClick={() => nav('/contracts')} />
 
-          {/* Collapsible analytics group */}
-          <ListItemButton
-            onClick={() => setAnalyticsOpen(o => !o)}
-            sx={{
-              ...itemSx(location.pathname.startsWith('/analytics') && !TOOL_ITEMS.some(t => isActive(t.path))),
-              justifyContent: 'space-between',
-            }}
-          >
-            <Box sx={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
-              <ListItemIcon sx={{ minWidth: 34 }}>
-                <BarChartOutlinedIcon sx={{ fontSize: 18 }} />
-              </ListItemIcon>
-              <Typography sx={{ fontSize: 13, fontWeight: 500, color: 'inherit' }}>
-                Analytics
-              </Typography>
-            </Box>
-            <Box sx={{ color: 'rgba(255,255,255,0.3)', display: 'flex', alignItems: 'center' }}>
-              {analyticsOpen ? <ExpandLessIcon sx={{ fontSize: 16 }} /> : <ExpandMoreIcon sx={{ fontSize: 16 }} />}
-            </Box>
-          </ListItemButton>
+          {/* AI Matches */}
+          <ParentItem label="AI Matches" Icon={AutoAwesomeOutlinedIcon}
+            active={isActive('/recommendations')} onClick={() => nav('/recommendations')} />
 
-          <AnimatePresence>
-            {analyticsOpen && (
-              <motion.div
-                initial={{ height: 0, opacity: 0 }}
-                animate={{ height: 'auto', opacity: 1 }}
-                exit={{ height: 0, opacity: 0 }}
-                transition={{ duration: 0.2 }}
-                style={{ overflow: 'hidden' }}
-              >
-                <Box sx={{ ml: 1.5, pl: 1.5, borderLeft: '1px solid rgba(255,255,255,0.08)', mx: 2, my: 0.5 }}>
-                  {ANALYTICS_SUB.map(({ label, path, Icon }) => (
-                    <SubNavItem key={path} label={label} path={path} Icon={Icon}
-                      active={isActive(path)} onClick={() => nav(path)} />
-                  ))}
-                </Box>
-              </motion.div>
-            )}
-          </AnimatePresence>
+          {/* Tools */}
+          <ParentItem label="Tools" Icon={BuildOutlinedIcon}
+            active={isToolRoute} expanded={toolOpen} hasChildren
+            onClick={() => setToolOpen(o => !o)} />
+          <CollapseGroup open={toolOpen}>
+            {TOOL_SUB.map(({ label, path }) => (
+              <SubItem key={path} label={label} active={isActive(path)} onClick={() => nav(path)} />
+            ))}
+          </CollapseGroup>
 
-          {/* Tools section */}
-          <SectionLabel>Tools</SectionLabel>
-          {TOOL_ITEMS.map(({ label, path, Icon }) => (
-            <NavItem key={path} label={label} path={path} Icon={Icon}
-              active={isActive(path)} onClick={() => nav(path)} />
-          ))}
+          <Divider sx={{ my: 1, borderColor: 'rgba(255,255,255,0.07)' }} />
 
-          <Divider sx={{ my: 1.5, mx: 2, borderColor: 'rgba(255,255,255,0.07)' }} />
-
-          {/* Account */}
-          <SectionLabel>Account</SectionLabel>
-          <NavItem label="Settings" path="/settings" Icon={SettingsOutlinedIcon}
-            active={isActive('/settings')} onClick={() => nav('/settings')} />
+          {/* Settings */}
+          <ParentItem label="Settings" Icon={SettingsOutlinedIcon}
+            active={isSettingRoute} expanded={settOpen} hasChildren
+            onClick={() => setSettOpen(o => !o)} />
+          <CollapseGroup open={settOpen}>
+            {SETTINGS_SUB.map(({ label, path }) => (
+              <SubItem key={path} label={label} active={isActive(path)} onClick={() => nav(path)} />
+            ))}
+          </CollapseGroup>
 
         </List>
       </Box>
@@ -248,16 +296,42 @@ export function Sidebar({ mobileOpen, onClose }: Props) {
     </Box>
   )
 
+  const drawerWidth = collapsed ? SIDEBAR_W_COL : SIDEBAR_W
+  const sidebarContent = collapsed ? collapsedContent : expandedContent
+
   return (
     <>
-      <Drawer variant="temporary" open={mobileOpen} onClose={onClose}
+      {/* Mobile temporary drawer — always full width */}
+      <Drawer
+        variant="temporary"
+        open={mobileOpen}
+        onClose={onClose}
         ModalProps={{ keepMounted: true }}
-        sx={{ display: { xs: 'block', lg: 'none' }, '& .MuiDrawer-paper': { width: DRAWER_WIDTH, bgcolor: '#0f1f35', border: 'none' } }}>
-        {sidebarContent}
+        sx={{
+          display: { xs: 'block', lg: 'none' },
+          '& .MuiDrawer-paper': { width: SIDEBAR_W, bgcolor: BG, border: 'none' },
+        }}
+      >
+        {expandedContent}
       </Drawer>
-      <Drawer variant="permanent"
-        sx={{ display: { xs: 'none', lg: 'block' }, '& .MuiDrawer-paper': { width: DRAWER_WIDTH, position: 'fixed', bgcolor: '#0f1f35', border: 'none', borderRight: '1px solid rgba(255,255,255,0.06)' } }}
-        open>
+
+      {/* Desktop permanent drawer */}
+      <Drawer
+        variant="permanent"
+        sx={{
+          display: { xs: 'none', lg: 'block' },
+          '& .MuiDrawer-paper': {
+            width: drawerWidth,
+            position: 'fixed',
+            bgcolor: BG,
+            border: 'none',
+            borderRight: '1px solid rgba(255,255,255,0.06)',
+            overflowX: 'hidden',
+            transition: 'width 0.25s ease',
+          },
+        }}
+        open
+      >
         {sidebarContent}
       </Drawer>
     </>
