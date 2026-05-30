@@ -82,7 +82,7 @@ export default function EnhancedOnboarding() {
   const set = <K extends keyof DraftCompany>(key: K, value: DraftCompany[K]) =>
     setDraft(d => ({ ...d, [key]: value }))
 
-  const saveProgress = async (nextStep: number, completed = false) => {
+  const saveProgress = async (nextStep: number, completed = false): Promise<boolean> => {
     setSaving(true)
     setError('')
     try {
@@ -90,8 +90,10 @@ export default function EnhancedOnboarding() {
       await companyApi.upsert(payload)
       // Keep Zustand store in sync so RecommendedContracts sees the latest profile
       setCompany(payload as unknown as Record<string, unknown>)
+      return true
     } catch (e: unknown) {
       setError((e as { response?: { data?: { detail?: string } } })?.response?.data?.detail || 'Save failed.')
+      return false
     } finally {
       setSaving(false)
     }
@@ -99,15 +101,15 @@ export default function EnhancedOnboarding() {
 
   const handleNext = async () => {
     const next = step + 1
-    await saveProgress(next)
-    if (!error) setStep(next)
+    const ok = await saveProgress(next)
+    if (ok) setStep(next)
   }
 
   const handleBack = () => setStep(s => s - 1)
 
   const handleFinish = async () => {
-    await saveProgress(STEPS.length, true)
-    if (!error) navigate('/recommendations')
+    const ok = await saveProgress(STEPS.length, true)
+    if (ok) navigate('/recommendations')
   }
 
   const toggleMulti = (arr: string[], val: string): string[] =>

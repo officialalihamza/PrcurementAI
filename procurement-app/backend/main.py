@@ -65,6 +65,22 @@ def health():
     return {"status": "healthy"}
 
 
+@app.get("/api/test-supabase")
+def test_supabase():
+    from lib.supabase import supabase_admin, SUPABASE_URL, SUPABASE_ANON_KEY, SUPABASE_SERVICE_ROLE_KEY
+    try:
+        supabase_admin.table("companies").select("id", count="exact").limit(1).execute()
+        return {
+            "status": "connected",
+            "message": "Supabase working",
+            "url_set": bool(SUPABASE_URL),
+            "anon_key_set": bool(SUPABASE_ANON_KEY),
+            "service_role_set": bool(SUPABASE_SERVICE_ROLE_KEY),
+        }
+    except Exception as e:
+        return {"status": "error", "message": str(e)}
+
+
 @app.post("/alerts/trigger")
 async def trigger_alerts_now():
     """Run all alert checks immediately and return the full trace in the response."""

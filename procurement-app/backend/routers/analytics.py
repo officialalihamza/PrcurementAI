@@ -109,6 +109,23 @@ _REGION_CANONICAL = {
     "northern ireland": "Northern Ireland",
 }
 
+# UK NUTS2/NUTS3/LAU code prefix → standard region
+# The 3rd character (index 2) identifies the region:
+_NUTS_TO_REGION = {
+    "C": "North East",
+    "D": "North West",
+    "E": "Yorkshire & The Humber",
+    "F": "East Midlands",
+    "G": "West Midlands",
+    "H": "East of England",
+    "I": "London",
+    "J": "South East",
+    "K": "South West",
+    "L": "Wales",
+    "M": "Scotland",
+    "N": "Northern Ireland",
+}
+
 _CITY_TO_REGION = {
     # London boroughs
     "westminster": "London", "stratford": "London", "croydon": "London",
@@ -186,14 +203,21 @@ _CITY_TO_REGION = {
 def _normalize_region(raw: str) -> str:
     if not raw:
         return ""
-    s = raw.lower().strip()
-    if s in _REGION_CANONICAL:
-        return _REGION_CANONICAL[s]
+    s = raw.strip()
+    # UK NUTS/LAU codes: "UKD35" → char[2]="D" → North West
+    upper = s.upper()
+    if upper.startswith("UK") and len(upper) >= 3:
+        region = _NUTS_TO_REGION.get(upper[2])
+        if region:
+            return region
+    lower = s.lower()
+    if lower in _REGION_CANONICAL:
+        return _REGION_CANONICAL[lower]
     for key, val in _REGION_CANONICAL.items():
-        if key in s:
+        if key in lower:
             return val
     for city, region in _CITY_TO_REGION.items():
-        if city in s:
+        if city in lower:
             return region
     return ""
 
@@ -266,12 +290,11 @@ def get_sme_trend(
                   "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"]
 
         if period == "monthly":
-            recent = by_year[-3:] if len(by_year) >= 3 else by_year
             result = []
-            for i, yr_data in enumerate(recent):
+            for i, yr_data in enumerate(by_year):
                 yr         = yr_data["year"]
                 rate_start = yr_data["sme_rate"]
-                rate_end   = recent[i + 1]["sme_rate"] if i + 1 < len(recent) else rate_start
+                rate_end   = by_year[i + 1]["sme_rate"] if i + 1 < len(by_year) else rate_start
                 for m in range(12):
                     frac  = m / 12
                     rate  = round(rate_start + (rate_end - rate_start) * frac, 1)

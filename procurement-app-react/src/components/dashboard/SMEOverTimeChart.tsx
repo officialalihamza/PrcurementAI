@@ -41,6 +41,22 @@ const FALLBACK: { month: string; sme_rate: number; total_contracts: number }[] =
   { month: 'Aug 25', sme_rate: 48.5, total_contracts: 5833 },
 ]
 
+const MONTH_FULL: Record<string, string> = {
+  Jan: 'January', Feb: 'February', Mar: 'March', Apr: 'April',
+  May: 'May', Jun: 'June', Jul: 'July', Aug: 'August',
+  Sep: 'September', Oct: 'October', Nov: 'November', Dec: 'December',
+}
+
+function expandMonth(label: string): string {
+  const parts = label.split(' ')
+  if (parts.length === 2) {
+    const full = MONTH_FULL[parts[0]] ?? parts[0]
+    const yr = parts[1].length === 2 ? `20${parts[1]}` : parts[1]
+    return `${full} ${yr}`
+  }
+  return label
+}
+
 interface Row { month: string; sme_rate: number; total_contracts: number }
 
 function CustomTooltip({ active, payload }: { active?: boolean; payload?: Array<{ payload: Row }> }) {
@@ -51,9 +67,8 @@ function CustomTooltip({ active, payload }: { active?: boolean; payload?: Array<
       bgcolor: '#fff', border: '1px solid #e8edf3', borderRadius: 2,
       px: 1.5, py: 1, boxShadow: '0 4px 12px rgba(0,0,0,0.1)',
     }}>
-      <Typography sx={{ fontSize: 12, fontWeight: 700, color: '#1F3A5F', mb: 0.25 }}>{d.month}</Typography>
-      <Typography sx={{ fontSize: 12, color: '#374151' }}>
-        <strong>{d.sme_rate}%</strong> SME award rate
+      <Typography sx={{ fontSize: 12, fontWeight: 700, color: '#1F3A5F', mb: 0.25 }}>
+        {expandMonth(d.month)}: <strong>{d.sme_rate}%</strong> SME
       </Typography>
       {d.total_contracts > 0 && (
         <Typography sx={{ fontSize: 11, color: '#9ca3af' }}>
@@ -113,7 +128,7 @@ export function SMEOverTimeChart() {
           <XAxis
             dataKey="month"
             tick={{ fontSize: 10, fill: '#6C757D' }}
-            interval={Math.floor(points.length / 8)}
+            interval={11}
           />
           <YAxis
             domain={[yMin, yMax]}

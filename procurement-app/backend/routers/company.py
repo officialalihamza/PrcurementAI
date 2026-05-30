@@ -23,7 +23,10 @@ def upsert_company(body: CompanyCreate, current_user: dict = Depends(get_current
         db = get_user_client(current_user["token"])
         existing = db.table("companies").select("id").eq("user_id", current_user["user_id"]).execute()
 
-        data = {k: v for k, v in body.model_dump().items() if v is not None}
+        data = {
+            k: v for k, v in body.model_dump().items()
+            if v is not None and v != ""
+        }
         data["user_id"] = current_user["user_id"]
         data.setdefault("name", "")
 

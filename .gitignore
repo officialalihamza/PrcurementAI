@@ -20,3 +20,5 @@ procurement-app-react/dist/
 
 # Keep the pre-computed analytics cache
 !procurement-app/backend/analytics_cache.json
+
+.vercel

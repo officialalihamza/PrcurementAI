@@ -3,6 +3,7 @@ import {
   Box, Typography, TextField, Select, MenuItem, FormControl, InputLabel,
   Button, Paper, Chip, LinearProgress, Slider, FormControlLabel,
   Checkbox, Tooltip, CircularProgress, Divider, IconButton, Collapse,
+  Dialog, DialogTitle, DialogContent, DialogActions,
 } from '@mui/material'
 import { motion, AnimatePresence } from 'framer-motion'
 import SaveOutlinedIcon          from '@mui/icons-material/SaveOutlined'
@@ -14,7 +15,7 @@ import LightbulbOutlinedIcon     from '@mui/icons-material/LightbulbOutlined'
 import PersonOutlinedIcon        from '@mui/icons-material/PersonOutlined'
 import ExpandMoreIcon            from '@mui/icons-material/ExpandMore'
 import ExpandLessIcon            from '@mui/icons-material/ExpandLess'
-import { barriersApi } from '../../services/api'
+import { barriersApi, companyApi } from '../../services/api'
 import { useCompanyStore } from '../../store/companyStore'
 import { useNavigate } from 'react-router-dom'
 import type { WinnabilityResult } from '../../types'
@@ -203,11 +204,10 @@ function liveInsights(form: FormState, company: Record<string, unknown> | null, 
 // ─── Gauge SVG ────────────────────────────────────────────────────────────────
 
 function GaugeSVG({ pct, color, animated = true }: { pct: number; color: string; animated?: boolean }) {
-  const FULL_ARC = 251.3   // half-circle circumference (π × r=80)
-  const dashLen  = (pct / 100) * FULL_ARC
-  const angle    = Math.PI - (pct / 100) * Math.PI
-  const x2 = 120 + 84 * Math.cos(angle)
-  const y2 = 105 - 84 * Math.sin(angle)
+  const FULL_ARC  = 251.3   // half-circle circumference (π × r=80)
+  const dashLen   = (pct / 100) * FULL_ARC
+  // rotate(deg, cx, cy): 0% = -90 (left), 50% = 0 (up), 100% = 90 (right)
+  const rotateDeg = (pct / 100) * 180 - 90
 
   return (
     <svg viewBox="0 0 240 120" style={{ width: '100%', maxWidth: 260, height: 'auto' }}>
@@ -223,9 +223,14 @@ function GaugeSVG({ pct, color, animated = true }: { pct: number; color: string;
       <text x="10"  y="116" fontSize="8" fill="#9ca3af">0</text>
       <text x="104" y="12"  fontSize="8" fill="#9ca3af" textAnchor="middle">50%</text>
       <text x="222" y="116" fontSize="8" fill="#9ca3af" textAnchor="end">100</text>
-      {/* Needle */}
-      <line x1="120" y1="105" x2={x2} y2={y2} stroke="#374151" strokeWidth="2.5" strokeLinecap="round"
-        style={animated ? { transition: 'x2 0.6s ease, y2 0.6s ease' } : undefined} />
+      {/* Needle — CSS rotate on <g> works in all browsers unlike x2/y2 transitions */}
+      <g style={{
+        transform: `rotate(${rotateDeg}deg)`,
+        transformOrigin: '120px 105px',
+        transition: animated ? 'transform 0.6s ease' : undefined,
+      }}>
+        <line x1="120" y1="105" x2="120" y2="28" stroke="#374151" strokeWidth="2.5" strokeLinecap="round" />
+      </g>
       <circle cx="120" cy="105" r="5" fill="#374151" />
     </svg>
   )
@@ -300,11 +305,20 @@ const DEFAULT_FORM: FormState = {
   requires_security: false, requires_social_value: false, requires_gdpr: false,
 }
 
+// Estimate team capacity from employee count for initial pre-fill
+function capFromEmployees(n: number): number {
+  if (n >= 50) return 80
+  if (n >= 20) return 70
+  if (n >= 10) return 60
+  if (n >= 5)  return 45
+  return 30
+}
+
 // ─── Main component ───────────────────────────────────────────────────────────
 
 export function WinnabilityPredictor() {
-  const navigate       = useNavigate()
-  const { company }    = useCompanyStore()
+  const navigate                   = useNavigate()
+  const { company, setCompany }    = useCompanyStore()
   const [form, setForm] = useState<FormState>(() => {
     if (!company) return DEFAULT_FORM
     return {
@@ -318,16 +332,29 @@ export function WinnabilityPredictor() {
   const [loading,  setLoading]  = useState(false)
   const [saved,    setSaved]    = useState(false)
   const [showText, setShowText] = useState(false)
+  const [infoOpen, setInfoOpen] = useState(false)
 
   const setF = (k: keyof FormState, v: unknown) => setForm(f => ({ ...f, [k]: v }))
 
-  // ── Sync from company profile ──────────────────────────────────────────────
+  // ── Fetch company from API on mount if not in store ───────────────────────
+  useEffect(() => {
+    if (company) return
+    companyApi.get().then(({ data }) => {
+      if (data.company) setCompany(data.company as Record<string, unknown>)
+    }).catch(() => {})
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [])
+
+  // ── Sync form from company profile (runs when company loads / changes) ─────
   useEffect(() => {
     if (!company) return
     setForm(f => ({
       ...f,
-      sector: f.sector || ((company.primary_sectors as string[] | undefined)?.[0] ?? ''),
-      region: f.region || ((company.region as string | undefined) ?? ''),
+      sector:         f.sector  || ((company.primary_sectors as string[] | undefined)?.[0] ?? ''),
+      region:         f.region  || ((company.region as string | undefined) ?? ''),
+      team_capacity:  f.team_capacity === DEFAULT_FORM.team_capacity
+        ? capFromEmployees((company.employees as number | undefined) ?? 0)
+        : f.team_capacity,
     }))
   }, [company])
 
@@ -672,8 +699,8 @@ export function WinnabilityPredictor() {
                 View Similar
               </Button>
             </Tooltip>
-            <Tooltip title="Learn how this score is calculated">
-              <IconButton size="small" onClick={() => window.open('https://www.gov.uk/guidance/find-a-tender-service', '_blank')}
+            <Tooltip title="How is this score calculated?">
+              <IconButton size="small" onClick={() => setInfoOpen(true)}
                 sx={{ border: '1px solid #e2e8f0', borderRadius: 2, p: 0.75, color: '#64748b',
                   '&:hover': { bgcolor: '#f8fafc', borderColor: '#94a3b8' } }}>
                 <InfoOutlinedIcon sx={{ fontSize: 16 }} />
@@ -745,6 +772,55 @@ export function WinnabilityPredictor() {
           </motion.div>
         )}
       </Box>
+      {/* ── Scoring methodology modal ────────────────────────────────── */}
+      <Dialog open={infoOpen} onClose={() => setInfoOpen(false)} maxWidth="sm" fullWidth>
+        <DialogTitle sx={{ fontSize: 15, fontWeight: 700, color: '#1F3A5F', pb: 1 }}>
+          How the Winnability Score is Calculated
+        </DialogTitle>
+        <DialogContent dividers>
+          {[
+            { color: '#16a34a', label: '≥ 65% — Low Barrier (Green)',   desc: 'Strong sector/region alignment, proportionate value, certifications held. Active pursuit recommended.' },
+            { color: '#d97706', label: '45–64% — Medium Barrier (Amber)', desc: 'Some gaps exist. Address certifications or consortium options. Bid is viable with effort.' },
+            { color: '#dc2626', label: '< 45% — High Barrier (Red)',     desc: 'Significant mismatches. Consider sub-contracting or skipping this contract.' },
+          ].map(({ color, label, desc }) => (
+            <Box key={label} sx={{ display: 'flex', gap: 1.5, mb: 2, alignItems: 'flex-start' }}>
+              <Box sx={{ width: 10, height: 10, borderRadius: '50%', bgcolor: color, mt: 0.5, flexShrink: 0 }} />
+              <Box>
+                <Typography sx={{ fontSize: 12, fontWeight: 700, color }}>{label}</Typography>
+                <Typography sx={{ fontSize: 12, color: '#374151', mt: 0.25 }}>{desc}</Typography>
+              </Box>
+            </Box>
+          ))}
+          <Divider sx={{ my: 1.5 }} />
+          <Typography sx={{ fontSize: 12, fontWeight: 700, color: '#1F3A5F', mb: 1 }}>Score Factors</Typography>
+          {[
+            ['Sector alignment',      'Your registered sectors vs. the contract sector'],
+            ['Financial ratio',       'Contract value relative to your annual turnover'],
+            ['Timeline',              'Days to bid submission — short timelines reduce score'],
+            ['Contract complexity',   'Estimated delivery difficulty (Low / Medium / High)'],
+            ['Team capacity',         'Your current team availability for this bid'],
+            ['Certifications',        'ISO 9001, ISO 27001, Cyber Essentials holdings vs. requirements'],
+            ['Experience',            'Years of public sector contract delivery'],
+            ['Region match',          'Your primary region vs. contract location'],
+            ['Incumbent signals',     'Specification language suggesting an existing preferred supplier'],
+            ['Framework route',       'Whether the contract is let via a framework agreement'],
+          ].map(([factor, explanation]) => (
+            <Box key={factor} sx={{ display: 'flex', gap: 1, mb: 0.75 }}>
+              <Typography sx={{ fontSize: 12, fontWeight: 600, color: '#374151', minWidth: 160 }}>{factor}</Typography>
+              <Typography sx={{ fontSize: 12, color: '#6C757D' }}>{explanation}</Typography>
+            </Box>
+          ))}
+          <Divider sx={{ my: 1.5 }} />
+          <Typography sx={{ fontSize: 11, color: '#9ca3af' }}>
+            Live estimate uses a heuristic model. Run Full Prediction for a logistic-regression–backed score
+            trained on 755,949 UK public sector contract outcomes (Contracts Finder + Find a Tender, 2016–2026).
+          </Typography>
+        </DialogContent>
+        <DialogActions>
+          <Button onClick={() => setInfoOpen(false)} sx={{ fontSize: 13, textTransform: 'none' }}>Close</Button>
+        </DialogActions>
+      </Dialog>
+
     </Box>
   )
 }
